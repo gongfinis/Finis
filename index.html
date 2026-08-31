@@ -437,6 +437,10 @@
   .design-modal-img { display: block; margin: 0 auto; max-width: 1100px; width: 100%; }
   .design-modal-close { position: fixed; top: 18px; right: 22px; z-index: 201; background: rgba(255,255,255,0.16); color: #fff; border: none; width: 44px; height: 44px; border-radius: 50%; font-size: 26px; line-height: 1; cursor: pointer; backdrop-filter: blur(10px); }
   .design-modal-close:hover { background: rgba(255,255,255,0.28); }
+  .design-modal-cta { position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%); z-index: 201; display: none; background: #0a84ff; color: #fff; padding: 12px 24px; border-radius: 999px; font-size: 14px; font-weight: 600; text-decoration: none; box-shadow: 0 8px 24px rgba(0,0,0,0.45); }
+  .design-modal-cta:hover { filter: brightness(1.08); }
+  .vc-card[data-vc-link], .vc-card[data-vc-modal] { cursor: pointer; }
+  .vc-card-hint { margin-top: 6px; font-size: 12px; font-weight: 600; color: #0a84ff; }
 
   /* ===== Vibe coding page ===== */
   .vc-philosophy { background: #161b22; border: 1px solid #30363d; border-radius: 16px; padding: 24px 28px; margin-bottom: 48px; }
@@ -1481,11 +1485,12 @@
 
         <div class="vc-section-title" style="color:#3fb950;border-color:#3fb950">生活场景</div>
         <div class="vc-grid">
-          <div class="vc-card">
+          <div class="vc-card" data-vc-link="https://gongfinis.github.io/focus_forest/">
             <div class="vc-card-icon" style="color:#3fb950"><svg class="icon" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
             <div class="vc-card-title">番茄钟专注 App</div>
             <p class="vc-card-desc">为个人高效学习开发的专注计时应用，支持任务管理和专注数据统计</p>
             <div class="vc-tags"><span class="vc-tag">React</span><span class="vc-tag">本地存储</span><span class="vc-tag">效率工具</span></div>
+            <div class="vc-card-hint">点击体验 →</div>
           </div>
           <div class="vc-card">
             <div class="vc-card-icon" style="color:#3fb950"><svg class="icon" width="24" height="24" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/></svg></div>
@@ -1493,11 +1498,12 @@
             <p class="vc-card-desc">实时追踪秋招投递进度与反馈状态，支持多维筛选与可视化展示</p>
             <div class="vc-tags"><span class="vc-tag">数据可视化</span><span class="vc-tag">状态管理</span></div>
           </div>
-          <div class="vc-card">
+          <div class="vc-card" data-vc-modal="design/小红书智能收藏.png" data-vc-link="https://gongfinis.github.io/xhs--intelligent_study_space/">
             <div class="vc-card-icon" style="color:#3fb950"><svg class="icon" width="24" height="24" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg></div>
             <div class="vc-card-title">小红书笔记智能收藏</div>
             <p class="vc-card-desc">基于 AI 的笔记自动分类与语义检索功能，解决「收藏了但找不到」的问题</p>
             <div class="vc-tags"><span class="vc-tag">LLM</span><span class="vc-tag">向量检索</span><span class="vc-tag">浏览器插件</span></div>
+            <div class="vc-card-hint">点击查看详情 →</div>
           </div>
           <div class="vc-card">
             <div class="vc-card-icon" style="color:#3fb950"><svg class="icon" width="24" height="24" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
@@ -1621,6 +1627,7 @@
 <div class="design-modal" id="designModal">
   <button class="design-modal-close" id="designModalClose" aria-label="关闭">×</button>
   <img class="design-modal-img" id="designModalImg" src="" alt="">
+  <a class="design-modal-cta" id="designModalCta" href="#" target="_blank" rel="noopener" style="display:none">体验链接 →</a>
 </div>
 
 <!-- Photo lightbox -->
@@ -1745,20 +1752,32 @@
   (function () {
     var modal = document.getElementById('designModal');
     var modalImg = document.getElementById('designModalImg');
+    var modalCta = document.getElementById('designModalCta');
     var modalClose = document.getElementById('designModalClose');
     if (!modal) return;
-    function openModal(src) {
+    function openModal(src, link, linkText) {
       modalImg.src = src;
+      if (modalCta) {
+        if (link) { modalCta.href = link; modalCta.textContent = linkText || '体验链接 →'; modalCta.style.display = ''; }
+        else { modalCta.style.display = 'none'; }
+      }
       modal.classList.add('open');
       document.body.style.overflow = 'hidden';
     }
     function closeModal() {
       modal.classList.remove('open');
       modalImg.src = '';
+      if (modalCta) modalCta.style.display = 'none';
       document.body.style.overflow = '';
     }
     document.querySelectorAll('.design-card[data-modal]').forEach(function (card) {
       card.addEventListener('click', function () { openModal(card.getAttribute('data-modal')); });
+    });
+    document.querySelectorAll('.vc-card[data-vc-modal]').forEach(function (card) {
+      card.addEventListener('click', function () { openModal(card.getAttribute('data-vc-modal'), card.getAttribute('data-vc-link'), '前往体验 →'); });
+    });
+    document.querySelectorAll('.vc-card[data-vc-link]:not([data-vc-modal])').forEach(function (card) {
+      card.addEventListener('click', function () { window.open(card.getAttribute('data-vc-link'), '_blank'); });
     });
     modalClose.addEventListener('click', closeModal);
     modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
