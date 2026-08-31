@@ -1758,7 +1758,7 @@
     function openModal(src, link, linkText) {
       modalImg.src = src;
       if (modalCta) {
-        if (link) { modalCta.href = link; modalCta.textContent = linkText || '体验链接 →'; modalCta.style.display = ''; }
+        if (link) { modalCta.href = link; modalCta.textContent = linkText || '体验链接 →'; modalCta.style.display = 'inline-block'; }
         else { modalCta.style.display = 'none'; }
       }
       modal.classList.add('open');
