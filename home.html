@@ -1,0 +1,1982 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Portfolio · 龚小菲 Finis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Atma:wght@700&family=Inter:wght@300;400;600;700&family=Caveat:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #0066cc;
+    --primary-focus: #0071e3;
+    --primary-on-dark: #2997ff;
+    --ink: #1d1d1f;
+    --body-on-dark: #ffffff;
+    --divider-soft: #f0f0f0;
+    --hairline: #e0e0e0;
+    --canvas: #ffffff;
+    --parchment: #f5f5f7;
+    --surface-black: #000000;
+    --blue: var(--primary);
+    --muted: #6e6e73;
+    --canvas-dark: #0d1117;
+    /* reference design tokens */
+    --ref-blue: #3B82F6;
+    --ref-blue-soft: #DBEAFE;
+    --ref-deep: #1E3A8A;
+    --ref-bg: #F8F9FA;
+    --ref-card: #FFFFFF;
+    --ref-ink: #1F2937;
+    --ref-ink-soft: #6B7280;
+    --ref-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--ink);
+    background: var(--canvas);
+    letter-spacing: -0.01em;
+  }
+  button { font-family: inherit; }
+  img { display: block; }
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ===== Shared nav bar ===== */
+  .navbar {
+    position: fixed; top: 0; left: 0; right: 0; height: 44px;
+    background: var(--parchment);
+    z-index: 100;
+    display: flex; align-items: center; padding: 0 20px;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+  }
+  .navbar.dark { background: var(--surface-black); border-bottom-color: rgba(255,255,255,0.08); }
+  .nav-brand {
+    background: none; border: none; color: var(--ink);
+    font-size: 13px; font-weight: 700;
+    letter-spacing: -0.12px; cursor: pointer; padding: 0 14px 0 0;
+    transition: opacity .15s;
+  }
+  .nav-brand:hover { opacity: .7; }
+  .nav-sep { width: 1px; height: 16px; background: rgba(0,0,0,0.15); margin-right: 14px; }
+  .navbar.dark .nav-brand, .navbar.dark .nav-link, .navbar.dark .nav-copy { color: var(--body-on-dark); }
+  .navbar.dark .nav-sep { background: rgba(255,255,255,0.2); }
+  .nav-link {
+    background: none; border: none; color: var(--ink);
+    font-size: 12px; font-weight: 400;
+    letter-spacing: -0.12px; cursor: pointer; padding: 0 10px;
+    opacity: 0.55; position: relative; transition: opacity .15s;
+  }
+  .nav-link:hover { opacity: 1; }
+  .nav-link.active { opacity: 1; font-weight: 600; }
+  .nav-link.active::after {
+    content: ''; position: absolute; bottom: -12px; left: 50%;
+    transform: translateX(-50%);
+    width: 4px; height: 4px; border-radius: 50%; background: var(--blue);
+  }
+  .nav-spacer { flex: 1; }
+  .nav-copy { color: var(--ink); font-size: 12px; opacity: 0.4; letter-spacing: -0.12px; }
+
+  /* ===== Home page ===== */
+  #page-home { min-height: 100vh; background: var(--canvas); position: relative; overflow: hidden; }
+  .folder {
+    position: absolute; z-index: 10;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    cursor: pointer; user-select: none;
+  }
+  .folder img {
+    display: block; height: auto;
+    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.18));
+    transition: transform .15s ease;
+  }
+  .folder:hover img { transform: scale(1.1); }
+  .folder .label {
+    font-weight: 600; color: var(--ink);
+    text-shadow: 0 1px 3px rgba(255,255,255,0.9);
+    margin-top: 4px; text-align: center;
+  }
+  .folder.lg img { width: 130px; } .folder.lg .label { font-size: 0.85rem; }
+  .folder.md img { width: 100px; } .folder.md .label { font-size: 0.75rem; }
+  .folder.sm img { width: 72px; }  .folder.sm .label { font-size: 0.75rem; }
+
+  .hero {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center; z-index: 5;
+    pointer-events: none; width: 100%; padding: 0 20px;
+  }
+  .hero .hero-banner {
+    width: 100%;
+    max-width: 1100px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+  }
+
+  .dock {
+    position: fixed; bottom: 10px; left: 50%;
+    transform: translateX(-50%); z-index: 100;
+    background: rgba(255,255,255,0.68);
+    backdrop-filter: blur(30px) saturate(200%);
+    -webkit-backdrop-filter: blur(30px) saturate(200%);
+    border-radius: 20px;
+    border: 1px solid rgba(0,0,0,0.10);
+    box-shadow: 0 2px 24px rgba(0,0,0,0.14), inset 0 0 0 0.5px rgba(255,255,255,0.5);
+    padding: 8px 12px;
+    display: flex; align-items: flex-end; gap: 6px;
+  }
+  .dock-item {
+    width: 52px; height: 52px; flex-shrink: 0;
+    cursor: pointer; position: relative;
+    display: flex; align-items: center; justify-content: center;
+    transform-origin: bottom center;
+    transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .dock-item img { width: 100%; height: 100%; object-fit: contain; border-radius: 12px; pointer-events: none; }
+
+  /* ===== Dock modals (contacts / messages / mail / notes / trash) ===== */
+  .dock-modal { position: fixed; inset: 0; z-index: 210; background: rgba(0,0,0,0.45); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center; padding: 24px; }
+  .dock-modal.open { display: flex; }
+  .dock-win { width: 100%; max-width: 440px; max-height: 85vh; background: rgba(246,246,246,0.96); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 14px; box-shadow: 0 30px 80px rgba(0,0,0,0.35); overflow: hidden; display: flex; flex-direction: column; }
+  .dock-win.wide { max-width: 820px; height: min(560px, 85vh); }
+  .dock-titlebar { height: 40px; background: rgba(230,230,230,0.9); display: flex; align-items: center; gap: 7px; padding: 0 14px; border-bottom: 1px solid rgba(0,0,0,0.08); flex-shrink: 0; }
+  .dock-close { width: 13px; height: 13px; border-radius: 50%; background: #ff5f57; border: none; cursor: pointer; flex-shrink: 0; padding: 0; }
+  .dock-close:hover { filter: brightness(0.92); }
+  .dock-traffic { width: 13px; height: 13px; border-radius: 50%; flex-shrink: 0; }
+  .dock-traffic.y { background: #febc2e; } .dock-traffic.g { background: #28c840; }
+  .dock-win-title { flex: 1; text-align: center; font-size: 13px; font-weight: 500; color: #3a3a3a; margin-right: 46px; }
+  .dock-win-body { overflow: auto; flex: 1; }
+
+  /* Contact card */
+  .ccard { padding: 30px 28px 26px; text-align: center; font-family: 'Inter', system-ui, sans-serif; }
+  .ccard-icon { width: 60px; height: 60px; border-radius: 50%; background: #fff; border: 1px solid #e0e0e0; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; color: var(--blue); }
+  .ccard-icon .icon { width: 28px; height: 28px; }
+  .ccard-label { font-size: 12px; color: #888; margin-bottom: 4px; }
+  .ccard-value { font-size: 20px; font-weight: 700; color: #1d1d1f; margin-bottom: 18px; letter-spacing: -0.01em; word-break: break-all; }
+  .ccard-copy { background: var(--blue); color: #fff; border: none; border-radius: 20px; padding: 9px 26px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background .2s ease, transform .15s ease; }
+  .ccard-copy:hover { background: var(--primary-focus); transform: translateY(-1px); }
+  .ccard-copy.done { background: #28c840; }
+  .ccard-hint { font-size: 11px; color: #aaa; margin-top: 12px; }
+
+  /* Guestbook (notes) */
+  .gb { padding: 18px 22px 22px; font-family: 'Inter', system-ui, sans-serif; }
+  .gb-lead { font-size: 13px; color: #888; margin: 0 0 16px; }
+  .gb-list { max-height: 240px; overflow-y: auto; margin-bottom: 16px; }
+  .gb-msg { background: #fffde7; border-radius: 10px; padding: 11px 14px; margin-bottom: 10px; border-left: 3px solid #f9c12e; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+  .gb-msg-head { display: flex; justify-content: space-between; margin-bottom: 4px; }
+  .gb-name { font-weight: 600; font-size: 13px; color: #333; }
+  .gb-time { font-size: 11px; color: #aaa; }
+  .gb-text { margin: 0; font-size: 13px; color: #444; line-height: 1.6; }
+  .gb-form { background: #fff; border-radius: 10px; padding: 14px; border: 1px solid rgba(0,0,0,0.08); }
+  .gb-input { width: 100%; border: none; outline: none; background: transparent; font-family: 'Inter', system-ui, sans-serif; font-size: 13px; color: #333; padding: 6px 0; }
+  #gbName { border-bottom: 1px solid #e8e8e8; margin-bottom: 10px; }
+  .gb-textarea { resize: none; line-height: 1.6; }
+  .gb-submit-row { text-align: right; margin-top: 8px; }
+  .gb-send { background: var(--blue); color: #fff; border: none; border-radius: 20px; padding: 7px 20px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .gb-send:hover { background: var(--primary-focus); }
+
+  /* Trash canvas (碎碎念) */
+  .dock-win.wide .dock-win-body { padding: 0; overflow: hidden; }
+  .sn-canvas { height: 100%; overflow: auto; position: relative; background-color: #f8f8f8; background-image: repeating-linear-gradient(0deg, transparent, transparent 27px, #e0e0e0 27px, #e0e0e0 28px), repeating-linear-gradient(90deg, transparent, transparent 27px, #e0e0e0 27px, #e0e0e0 28px); background-size: 28px 28px; }
+  .sn-inner { position: relative; width: 820px; height: 500px; }
+  .sn-note { position: absolute; width: 180px; min-height: 90px; padding: 12px 14px; border-radius: 6px; font-family: 'Inter', system-ui, sans-serif; font-size: 13px; color: #333; line-height: 1.65; white-space: pre-line; box-shadow: 2px 4px 12px rgba(0,0,0,0.12); transition: transform .15s ease, box-shadow .15s ease; z-index: 1; }
+
+  /* ===== Sub-pages (reference design style) ===== */
+  .subpage { min-height: 100vh; padding-top: 44px; padding-bottom: 0; background: var(--ref-bg); }
+  .subpage.dark { background: var(--canvas-dark); color: var(--body-on-dark); }
+
+  /* Crumb bar (top label strip) */
+  .crumb-bar {
+    display: none;
+  }
+  .crumb-bar i { font-style: normal; opacity: 0.4; }
+  .crumb-bar .crumb-active { color: var(--ref-blue); }
+
+  .container { max-width: 1080px; margin: 0 auto; padding: 16px 32px 0; }
+  .back-btn {
+    background: none; border: none; font-size: 14px; color: var(--ref-blue);
+    cursor: pointer; padding: 0; margin-bottom: 28px;
+    display: inline-flex; align-items: center; gap: 6px; font-weight: 600;
+  }
+
+  /* Sub hero */
+  .sub-hero { margin-bottom: 48px; }
+  .handwriting {
+    font-family: 'Caveat', 'Atma', cursive;
+    font-size: clamp(48px, 7vw, 80px); font-weight: 700;
+    color: var(--ref-deep); line-height: 1; margin: 0 0 12px;
+  }
+  .subpage.dark .handwriting { color: var(--primary-on-dark); }
+  /* Intern detail hero title: plain sans-serif, not handwriting */
+  [id^="page-intern-"] .sub-hero .handwriting {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: clamp(30px, 4.5vw, 44px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--primary-on-dark);
+  }
+  .sub-lead { font-size: 17px; font-weight: 300; color: var(--ref-ink-soft); max-width: 600px; }
+  .subpage.dark .sub-lead { color: #8b949e; }
+
+  /* Blue tab nav */
+  .tab-nav { display: flex; gap: 8px; margin-bottom: 32px; flex-wrap: wrap; }
+  .tab {
+    background: var(--ref-card); border: 1px solid var(--ref-blue-soft);
+    color: var(--ref-blue); font-size: 13px; font-weight: 600;
+    padding: 8px 18px; border-radius: 9999px; cursor: pointer;
+    transition: all .15s;
+  }
+  .tab.active { background: var(--ref-blue); color: #fff; border-color: var(--ref-blue); }
+
+  /* Two column layout */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; margin-bottom: 64px; }
+  .two-col.left-heavy { grid-template-columns: 1.3fr 1fr; }
+
+  /* White card */
+  .wcard { background: var(--ref-card); border-radius: 16px; padding: 28px; box-shadow: var(--ref-shadow); }
+  .wcard h3 { font-size: 22px; font-weight: 700; color: var(--ref-ink); margin: 0 0 8px; }
+  .wcard p { font-size: 15px; color: var(--ref-ink-soft); line-height: 1.7; }
+
+  /* Circular data cards */
+  .data-row { display: flex; gap: 24px; flex-wrap: wrap; justify-content: center; }
+  .data-circle {
+    width: 150px; height: 150px; border-radius: 50%;
+    background: var(--ref-blue-soft);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+  }
+  .data-circle .num { font-family: 'Anton', sans-serif; font-size: 32px; color: var(--ref-blue); line-height: 1; }
+  .data-circle .lbl { font-size: 11px; color: var(--ref-ink-soft); margin-top: 6px; padding: 0 8px; }
+
+  /* Numbered approach list */
+  .approach-item { display: flex; gap: 14px; margin-bottom: 20px; align-items: flex-start; }
+  .approach-dot {
+    width: 28px; height: 28px; border-radius: 50%; background: var(--ref-blue);
+    color: #fff; font-size: 13px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .approach-text h4 { font-size: 15px; font-weight: 700; color: var(--ref-ink); margin: 0 0 4px; }
+  .approach-text p { font-size: 13px; color: var(--ref-ink-soft); line-height: 1.6; margin: 0; }
+
+  /* Section title */
+  .sec-title { font-size: 13px; font-weight: 700; color: var(--ref-blue); text-transform: uppercase; letter-spacing: 0.1em; margin: 0 0 6px; }
+  .sec-head { font-family: 'Anton', sans-serif; font-size: 32px; font-weight: 400; color: var(--ref-ink); margin: 0 0 28px; line-height: 1.1; }
+  .subpage.dark .sec-head { color: var(--body-on-dark); }
+
+  /* Deep blue CTA card */
+  .cta-deep {
+    background: var(--ref-deep); border-radius: 20px; padding: 40px;
+    margin: 64px 0 0; display: grid; grid-template-columns: 1.5fr 1fr; gap: 32px; align-items: center;
+  }
+  .cta-deep h2 { font-family: 'Caveat', cursive; font-size: 44px; font-weight: 700; color: #fff; margin: 0 0 8px; }
+  .cta-deep p { font-size: 14px; color: rgba(255,255,255,0.8); line-height: 1.6; }
+  .cta-contact { display: flex; flex-direction: column; gap: 12px; }
+  .cta-contact-item {
+    background: rgba(255,255,255,0.1); border-radius: 12px; padding: 14px 18px;
+    display: flex; align-items: center; gap: 12px; color: #fff; font-size: 14px;
+  }
+  .cta-contact-item svg { flex-shrink: 0; }
+
+  /* ===== About page ===== */
+  .about-intro-grid { display: grid; grid-template-columns: auto 1fr; gap: 32px; align-items: center; margin-bottom: 56px; }
+  .about-avatar {
+    width: 130px; height: 130px; border-radius: 50%; object-fit: cover;
+    border: 4px solid #fff; box-shadow: var(--ref-shadow);
+  }
+  .about-intro h1 { font-family: 'Anton', sans-serif; font-size: 40px; color: var(--ref-ink); margin: 0 0 6px; }
+  .about-intro p { font-size: 15px; color: var(--ref-ink-soft); line-height: 1.7; }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+  .chip { font-size: 12px; background: var(--ref-blue); color: #fff; border-radius: 20px; padding: 5px 14px; font-weight: 600; }
+
+  .edu-card { background: var(--ref-card); border-radius: 16px; padding: 24px 28px; box-shadow: var(--ref-shadow); margin-bottom: 16px; }
+  .edu-head { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  .edu-school { font-size: 17px; font-weight: 700; color: var(--ref-ink); }
+  .edu-meta { font-size: 13px; color: var(--ref-ink-soft); margin-top: 2px; }
+  .edu-period { font-size: 12px; color: #aaa; }
+  .grade-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+  .grade-chip { background: var(--ref-bg); border-radius: 8px; padding: 5px 12px; font-size: 12px; color: #444; }
+  .grade-chip strong { color: var(--ref-blue); }
+  .edu-note { font-size: 12px; color: var(--ref-ink-soft); border-top: 1px solid var(--divider-soft); padding-top: 10px; }
+
+  .profile-card { background: var(--ref-card); border-radius: 16px; padding: 24px 28px; box-shadow: var(--ref-shadow); margin-bottom: 56px; }
+  .profile-card .sec-title { margin-bottom: 14px; }
+  .profile-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 4px 40px; }
+  .profile-row { display: flex; gap: 14px; padding: 9px 0; border-bottom: 1px solid var(--divider-soft); }
+  .profile-row:last-child { border-bottom: none; }
+  .profile-k { width: 64px; flex-shrink: 0; font-size: 12px; color: var(--ref-ink-soft); font-weight: 600; }
+  .profile-v { font-size: 14px; color: var(--ref-ink); font-weight: 500; }
+
+  .award-chips { display: flex; flex-wrap: wrap; gap: 10px; }
+  .award-chip { background: var(--ref-card); border: 1px solid var(--hairline); border-radius: 20px; padding: 7px 16px; font-size: 13px; color: var(--ref-ink); box-shadow: var(--ref-shadow); }
+
+  .skills-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+  .skill-card { background: var(--ref-card); border-radius: 14px; padding: 20px; box-shadow: var(--ref-shadow); }
+  .skill-title { font-size: 11px; font-weight: 700; color: var(--ref-blue); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.08em; }
+  .skill-item { font-size: 13px; color: #555; line-height: 2; }
+
+  /* ===== Projects page ===== */
+  .job-card { background: var(--ref-card); border-radius: 16px; margin-bottom: 18px; box-shadow: var(--ref-shadow); overflow: hidden; }
+  .job-head { padding: 20px 24px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: background .15s; }
+  .job-head:hover { background: var(--ref-bg); }
+  .job-head-left { display: flex; align-items: center; gap: 16px; }
+  .job-logo { width: 48px; height: 48px; border-radius: 12px; object-fit: contain; background: #fff; padding: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+  .job-company { font-size: 17px; font-weight: 700; color: var(--ref-ink); }
+  .job-role { font-size: 13px; color: var(--ref-ink-soft); margin-top: 2px; }
+  .job-arrow { font-size: 20px; color: var(--ref-ink-soft); transition: transform 0.2s; }
+  .job-arrow.open { transform: rotate(90deg); }
+  .job-body { padding: 0 24px 24px; border-top: 1px solid var(--divider-soft); display: none; }
+  .job-body.open { display: block; }
+  .highlight { font-size: 14px; color: #444; line-height: 1.7; padding-left: 14px; margin-bottom: 8px; border-left: 3px solid var(--ref-blue); }
+  .proj-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 14px; margin-top: 12px; }
+  .proj-card { background: var(--ref-bg); border-radius: 12px; padding: 18px; }
+  .proj-title { font-size: 14px; font-weight: 700; color: var(--ref-ink); margin-bottom: 12px; }
+  .proj-field { margin-bottom: 8px; }
+  .proj-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ref-blue); }
+  .proj-val { font-size: 13px; color: #555; margin: 3px 0 0; line-height: 1.6; }
+
+  /* Section divider */
+  .exp-divider { margin: 72px 0 32px; }
+  .exp-divider h2 { font-family: 'Anton', sans-serif; font-size: 28px; color: var(--ref-ink); margin: 0 0 6px; }
+  .exp-divider p { font-size: 14px; color: var(--ref-ink-soft); }
+
+  /* Internship duty blocks */
+  .duty-block { margin-bottom: 16px; padding: 16px 18px; background: var(--ref-bg); border-radius: 12px; border-left: 3px solid var(--ref-blue); }
+  .duty-tag { display: inline-block; font-size: 11px; font-weight: 700; color: #fff; background: var(--ref-blue); border-radius: 6px; padding: 3px 9px; margin-bottom: 8px; }
+  .duty-text { font-size: 14px; color: #444; line-height: 1.75; }
+
+  /* Project item (foldable) */
+  .proj-item { background: var(--ref-card); border-radius: 16px; margin-bottom: 16px; box-shadow: var(--ref-shadow); overflow: hidden; }
+  .proj-item-head { padding: 20px 24px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: background .15s; }
+  .proj-item-head:hover { background: var(--ref-bg); }
+  .proj-item-head::after { content: '›'; font-size: 24px; color: var(--ref-ink-soft); transition: transform .2s; line-height: 1; }
+  .proj-item-head.open::after { transform: rotate(90deg); }
+  .proj-item-head-left { flex: 1; }
+  .proj-item-title { font-size: 16px; font-weight: 700; color: var(--ref-ink); margin: 0 0 4px; }
+  .proj-item-time { font-size: 12px; color: #aaa; }
+  .proj-item-badge { background: var(--ref-blue-soft); color: var(--ref-deep); font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 9999px; white-space: nowrap; }
+  .proj-item-body { padding: 0 24px 24px; border-top: 1px solid var(--divider-soft); display: none; }
+  .proj-item-body.open { display: block; }
+
+  /* Flow diagram */
+  .flow { display: flex; align-items: stretch; gap: 0; margin: 20px 0 24px; flex-wrap: wrap; }
+  .flow-node {
+    background: var(--ref-blue-soft); flex: 1; min-width: 120px;
+    padding: 12px 14px; border-radius: 10px; text-align: center;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .flow-node.goal { background: #E0E7FF; }
+  .flow-node.action { background: #FEF3C7; }
+  .flow-node.result { background: #D1FAE5; }
+  .flow-stage { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.7; margin-bottom: 4px; }
+  .flow-node.goal .flow-stage { color: var(--ref-deep); }
+  .flow-node.action .flow-stage { color: #92400e; }
+  .flow-node.result .flow-stage { color: #065f46; }
+  .flow-node .flow-bg .flow-stage { color: var(--ref-blue); }
+  .flow-key { font-size: 13px; font-weight: 700; color: var(--ref-ink); line-height: 1.3; }
+  .flow-arrow {
+    display: flex; align-items: center; justify-content: center;
+    color: var(--ref-blue); font-size: 20px; padding: 0 6px; font-weight: 700;
+  }
+
+  /* Project detail blocks */
+  .proj-detail-block { margin-bottom: 18px; }
+  .proj-detail-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; display: inline-block; padding: 3px 10px; border-radius: 6px; }
+  .proj-detail-label.bg { background: var(--ref-blue-soft); color: var(--ref-blue); }
+  .proj-detail-label.goal { background: #E0E7FF; color: var(--ref-deep); }
+  .proj-detail-label.action { background: #FEF3C7; color: #92400e; }
+  .proj-detail-label.result { background: #D1FAE5; color: #065f46; }
+  .proj-detail-text { font-size: 14px; color: #444; line-height: 1.8; }
+  .proj-detail-list { list-style: none; padding: 0; margin: 0; }
+  .proj-detail-list li { font-size: 14px; color: #444; line-height: 1.8; padding-left: 18px; position: relative; margin-bottom: 8px; }
+  .proj-detail-list li::before { content: ''; position: absolute; left: 0; top: 11px; width: 6px; height: 6px; border-radius: 50%; background: var(--ref-blue); }
+
+  /* Intern summary (主要职责 + 查看详细) */
+  .intern-summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; background: linear-gradient(135deg, var(--ref-blue-soft), #E0E7FF); border-radius: 14px; padding: 18px 22px; margin-bottom: 22px; }
+  .intern-summary-label { font-size: 11px; font-weight: 700; color: var(--ref-blue); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+  .intern-summary-text { font-size: 14px; color: var(--ref-ink); font-weight: 600; line-height: 1.55; }
+  .view-detail-btn { background: var(--ref-blue); color: #fff; border: none; font-size: 13px; font-weight: 600; padding: 10px 18px; border-radius: 9999px; cursor: pointer; white-space: nowrap; transition: background .15s, transform .15s; flex-shrink: 0; }
+  .view-detail-btn:hover { background: var(--ref-deep); transform: translateX(2px); }
+
+  /* Ability cards */
+  .ability-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 18px; margin-bottom: 48px; }
+  .ability-card { background: var(--ref-card); border-radius: 14px; padding: 24px; box-shadow: var(--ref-shadow); border-top: 3px solid var(--ref-blue); }
+  .ability-icon { width: 42px; height: 42px; border-radius: 10px; background: var(--ref-blue-soft); color: var(--ref-blue); display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+  .ability-title { font-size: 15px; font-weight: 700; color: var(--ref-ink); margin: 0 0 8px; }
+  .ability-desc { font-size: 13px; color: var(--ref-ink-soft); line-height: 1.7; margin: 0; }
+
+  /* Contribution box */
+  .contrib-box { background: linear-gradient(135deg, var(--ref-deep), #1e40af); border-radius: 16px; padding: 28px 32px; margin-bottom: 48px; }
+  .contrib-box .sec-title { color: #93c5fd; }
+  .contrib-box h3 { color: #fff; font-family: 'Anton', sans-serif; font-size: 24px; margin: 0 0 20px; font-weight: 400; }
+  .contrib-box .data-row { gap: 20px; }
+  .contrib-box .data-circle { background: rgba(255,255,255,0.12); }
+  .contrib-box .data-circle .num { color: #fff; }
+  .contrib-box .data-circle .lbl { color: rgba(255,255,255,0.8); }
+
+  /* Hide project section on projects page (moved to intern detail pages) */
+  #page-projects .exp-divider.proj-section,
+  #page-projects .exp-divider.proj-section ~ .proj-item { display: none; }
+
+  /* Section divider */
+  .design-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
+  .design-card { background: var(--ref-card); border-radius: 16px; overflow: hidden; box-shadow: var(--ref-shadow); cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+  .design-card:hover { transform: translateY(-5px); box-shadow: 0 16px 40px rgba(0,0,0,0.12); }
+  .design-card-img { width: 100%; aspect-ratio: 3/2; overflow: hidden; background: var(--ref-bg); }
+  .design-card-img img { width: 100%; height: 100%; object-fit: cover; }
+  .design-card-body { padding: 20px 22px 22px; }
+  .design-card-title { font-size: 17px; font-weight: 700; color: var(--ref-ink); margin: 0 0 6px; }
+  .design-card-desc { font-size: 14px; color: var(--ref-ink-soft); line-height: 1.5; }
+  .design-card.zoomable { cursor: zoom-in; }
+
+  /* Design detail modal */
+  .design-modal { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.92); display: none; overflow-y: auto; overflow-x: hidden; padding: 56px 0 40px; }
+  .design-modal.open { display: block; }
+  .design-modal-img { display: block; margin: 0 auto; max-width: 1100px; width: 100%; }
+  .design-modal-close { position: fixed; top: 18px; right: 22px; z-index: 201; background: rgba(255,255,255,0.16); color: #fff; border: none; width: 44px; height: 44px; border-radius: 50%; font-size: 26px; line-height: 1; cursor: pointer; backdrop-filter: blur(10px); }
+  .design-modal-close:hover { background: rgba(255,255,255,0.28); }
+
+  /* ===== Vibe coding page ===== */
+  .vc-philosophy { background: #161b22; border: 1px solid #30363d; border-radius: 16px; padding: 24px 28px; margin-bottom: 48px; }
+  .vc-philosophy p { font-size: 15px; color: #c9d1d9; line-height: 1.75; }
+  .vc-section-title { font-size: 14px; font-weight: 700; margin-bottom: 18px; border-left: 3px solid; padding-left: 12px; text-transform: uppercase; letter-spacing: 0.08em; }
+  .vc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-bottom: 48px; }
+  .vc-card { background: #161b22; border: 1px solid #30363d; border-radius: 14px; padding: 20px; transition: border-color 0.15s ease; }
+  .vc-card:hover { border-color: var(--primary-on-dark); }
+  .vc-card-icon { margin-bottom: 12px; }
+  .vc-card-title { font-size: 15px; font-weight: 700; color: var(--body-on-dark); margin-bottom: 8px; }
+  .vc-card-desc { font-size: 13px; color: #8b949e; line-height: 1.65; margin: 0 0 14px; }
+  .vc-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .vc-tag { font-size: 11px; background: #1f2937; color: var(--primary-on-dark); border-radius: 20px; padding: 3px 9px; border: 1px solid #30363d; }
+
+  /* ===== Interests page ===== */
+  .interest-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 24px; }
+  .interest-card { background: var(--ref-card); border-radius: 16px; overflow: hidden; box-shadow: var(--ref-shadow); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+  .interest-card:hover { transform: translateY(-5px); box-shadow: 0 16px 40px rgba(0,0,0,0.12); }
+  .interest-img { width: 100%; height: 170px; overflow: hidden; position: relative; }
+  .interest-img img { width: 100%; height: 100%; object-fit: cover; }
+  .interest-icon { position: absolute; top: 14px; left: 14px; background: #fff; border-radius: 10px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+  .interest-body { padding: 18px 20px 22px; }
+  .interest-title-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
+  .interest-title { font-size: 17px; font-weight: 700; color: var(--ref-ink); }
+  .interest-sub { font-size: 11px; font-weight: 600; border-radius: 20px; padding: 3px 10px; }
+  .interest-desc { font-size: 13px; color: var(--ref-ink-soft); line-height: 1.65; }
+
+  /* Interests page: blue folder base + 3:4 photo cards */
+  #page-interests .subpage { background: linear-gradient(180deg, #eaf2fc 0%, #e4edfa 100%); }
+  .if-folder { position: relative; margin-top: 8px; }
+  .if-folder-tab {
+    width: 42%; min-width: 220px; height: 38px;
+    background: linear-gradient(180deg, #7DB8EA 0%, #5A9CE0 100%);
+    border-radius: 14px 14px 0 0; margin-left: 36px;
+    position: relative; z-index: 2;
+    border: 1px solid rgba(255,255,255,0.3); border-bottom: none;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 18px;
+  }
+  .if-folder-tab .if-tab-label { font-size: 11px; font-weight: 700; color: #fff; letter-spacing: 0.14em; }
+  .if-folder-tab .if-tab-count { font-size: 10px; font-weight: 500; color: rgba(255,255,255,0.85); }
+  .if-folder-body {
+    position: relative;
+    background: linear-gradient(160deg, #6FB3E8 0%, #4A9BE0 55%, #2E7BD0 100%);
+    border-radius: 0 20px 20px 20px;
+    padding: 60px 44px 64px;
+    box-shadow: 0 28px 64px rgba(0,80,180,0.30), inset 0 1px 0 rgba(255,255,255,0.4);
+    border: 1px solid rgba(255,255,255,0.3); border-top: none;
+    overflow: visible;
+  }
+  .if-cards { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 30px; }
+  .if-card {
+    position: relative; width: 190px; aspect-ratio: 3/4;
+    border-radius: 14px; overflow: hidden; background: #fff;
+    border: 2px solid #fff; box-shadow: 0 10px 24px rgba(0,0,0,0.22);
+    transform: rotate(var(--rot, 0deg)) translateY(var(--oy, 0px));
+    transition: transform .35s cubic-bezier(.2,.7,.2,1), box-shadow .35s ease;
+    will-change: transform;
+  }
+  .if-card:hover { transform: rotate(0deg) translateY(-12px) scale(1.045); z-index: 20; box-shadow: 0 22px 50px rgba(0,0,0,0.4); }
+  .if-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .if-card .if-desc {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.78));
+    display: flex; align-items: center; justify-content: center;
+    padding: 18px; opacity: 0; transition: opacity .3s ease;
+  }
+  .if-card:hover .if-desc { opacity: 1; }
+  .if-card .if-desc p { color: #fff; font-size: 12.5px; line-height: 1.6; text-align: center; margin: 0; }
+  .if-card .if-shade { position: absolute; left: 0; right: 0; bottom: 0; height: 46%; background: linear-gradient(180deg, transparent, rgba(0,0,0,0.72)); pointer-events: none; }
+  .if-card .if-badge {
+    position: absolute; top: 12px; left: 12px; width: 34px; height: 34px;
+    border-radius: 10px; background: rgba(255,255,255,0.92);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2); z-index: 3;
+  }
+  .if-card .if-badge .icon { width: 20px; height: 20px; }
+  .if-card .if-label { position: absolute; left: 14px; right: 14px; bottom: 14px; z-index: 2; }
+  .if-card .if-title { font-size: 15px; font-weight: 700; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.5); }
+  .if-card .if-sub { font-size: 11px; font-weight: 600; color: #fff; opacity: 0.9; margin-top: 2px; }
+  .if-card.clickable { cursor: pointer; }
+  @media (max-width: 900px) { .if-cards { gap: 22px; } .if-card { width: 170px; } .if-folder-body { padding: 48px 32px 52px; } }
+  @media (max-width: 560px) { .if-card { width: 150px; } .if-folder-tab { width: 56%; min-width: 0; } }
+
+  /* Icon SVG */
+  .icon { stroke: currentColor; stroke-width: 1.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* ===== Photo album page ===== */
+  .interest-card.clickable { cursor: pointer; }
+  .interest-card.clickable .interest-img::after { content: '查看相册 →'; position: absolute; right: 14px; bottom: 14px; background: rgba(0,0,0,0.55); color: #fff; font-size: 11px; font-weight: 600; padding: 5px 11px; border-radius: 9999px; backdrop-filter: blur(4px); letter-spacing: 0.02em; }
+
+  .album-hero { position: relative; width: 100%; height: 56vh; min-height: 380px; overflow: hidden; border-radius: 20px; margin-bottom: 40px; background: #111; }
+  .album-hero img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .album-hero-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.2) 40%, rgba(0,0,0,0.7) 100%); display: flex; flex-direction: column; justify-content: flex-end; padding: 40px 44px; }
+  .album-hero-eyebrow { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.7); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 10px; }
+  .album-hero-title { font-size: 44px; font-weight: 800; color: #fff; line-height: 1.1; letter-spacing: -0.02em; max-width: 600px; }
+  .album-hero-desc { font-size: 15px; color: rgba(255,255,255,0.8); margin-top: 14px; max-width: 520px; line-height: 1.7; }
+
+  .album-masonry { column-count: 3; column-gap: 18px; }
+  .album-masonry .album-tile { break-inside: avoid; margin-bottom: 18px; position: relative; overflow: hidden; border-radius: 14px; background: #16161a; cursor: pointer; }
+  .album-masonry .album-tile img { width: 100%; display: block; transition: transform 0.6s cubic-bezier(0.2,0.8,0.2,1), filter 0.4s ease; }
+  .album-masonry .album-tile::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 60%, rgba(0,0,0,0.45) 100%); opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
+  .album-masonry .album-tile:hover img { transform: scale(1.04); }
+  .album-masonry .album-tile:hover::after { opacity: 1; }
+  .album-tile-num { position: absolute; top: 12px; left: 12px; font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.85); background: rgba(0,0,0,0.4); backdrop-filter: blur(6px); width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 2; }
+
+  @media (max-width: 900px) { .album-masonry { column-count: 2; } .album-hero-title { font-size: 32px; } .album-hero-overlay { padding: 28px; } }
+  @media (max-width: 560px) { .album-masonry { column-count: 1; } }
+
+  /* ===== Lightbox ===== */
+  .lightbox { position: fixed; inset: 0; background: rgba(8,8,10,0.96); z-index: 9999; display: none; align-items: center; justify-content: center; }
+  .lightbox.open { display: flex; }
+  .lightbox-stage { position: relative; max-width: 92vw; max-height: 88vh; }
+  .lightbox-stage img { max-width: 92vw; max-height: 88vh; object-fit: contain; border-radius: 8px; box-shadow: 0 24px 80px rgba(0,0,0,0.6); display: block; }
+  .lightbox-btn { position: absolute; top: 50%; transform: translateY(-50%); width: 52px; height: 52px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s ease; backdrop-filter: blur(8px); z-index: 2; }
+  .lightbox-btn:hover { background: rgba(255,255,255,0.22); }
+  .lightbox-btn.prev { left: 24px; }
+  .lightbox-btn.next { right: 24px; }
+  .lightbox-close { position: absolute; top: 24px; right: 24px; width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s ease; backdrop-filter: blur(8px); }
+  .lightbox-close:hover { background: rgba(255,255,255,0.22); }
+  .lightbox-counter { position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.7); font-size: 13px; font-weight: 600; letter-spacing: 0.1em; }
+  .lightbox-counter b { color: #fff; }
+
+  @media (max-width: 834px) {
+    .hero h1 { font-size: 72px; letter-spacing: 8px; }
+    .folder.lg img { width: 88px; }
+    .folder.md img { width: 68px; }
+    .folder.sm img { width: 52px; }
+    .two-col, .two-col.left-heavy { grid-template-columns: 1fr; gap: 32px; }
+    .about-intro-grid { grid-template-columns: 1fr; text-align: center; justify-items: center; }
+    .cta-deep { grid-template-columns: 1fr; padding: 28px; }
+  }
+  @media (max-width: 760px) {
+    .hero h1 { font-size: 56px; letter-spacing: 5px; }
+    .hero .photo { display: none; }
+    .container, .crumb-bar { padding-left: 20px; padding-right: 20px; }
+    .data-row { gap: 16px; }
+    .data-circle { width: 120px; height: 120px; }
+    .data-circle .num { font-size: 26px; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- ===== Shared nav bar ===== -->
+  <nav class="navbar" id="navbar">
+    <button class="nav-brand" data-nav="home">Portfolio</button>
+    <div class="nav-sep"></div>
+    <button class="nav-link" data-nav="about">关于我</button>
+    <button class="nav-link" data-nav="projects">工作项目</button>
+    <button class="nav-link" data-nav="design">设计</button>
+    <button class="nav-link" data-nav="vibe">Vibe Coding</button>
+    <button class="nav-link" data-nav="interests">兴趣爱好</button>
+    <div class="nav-spacer"></div>
+    <span class="nav-copy">© 2026 Finis</span>
+  </nav>
+
+  <!-- ===== HOME ===== -->
+  <div class="page active" id="page-home">
+    <div class="folder lg" style="top:10%; left:7%;  transform: rotate(-7deg);" data-nav="about">
+      <img src="img-folder.png" alt="关于我" draggable="false">
+      <span class="label" style="transform: rotate(7deg);">关于我</span>
+    </div>
+    <div class="folder md" style="top:8%;  left:55%; transform: rotate(5deg);" data-nav="projects">
+      <img src="img-folder.png" alt="工作项目" draggable="false">
+      <span class="label" style="transform: rotate(-5deg);">工作项目</span>
+    </div>
+    <div class="folder sm" style="top:7%;  left:80%; transform: rotate(-4deg);" data-nav="design">
+      <img src="img-folder.png" alt="设计" draggable="false">
+      <span class="label" style="transform: rotate(4deg);">设计</span>
+    </div>
+    <div class="folder md" style="top:55%; left:10%; transform: rotate(3deg);" data-nav="vibe">
+      <img src="img-folder.png" alt="Vibe Coding" draggable="false">
+      <span class="label" style="transform: rotate(-3deg);">Vibe Coding</span>
+    </div>
+    <div class="folder lg" style="top:56%; left:72%; transform: rotate(-2deg);" data-nav="interests">
+      <img src="img-folder.png" alt="兴趣爱好" draggable="false">
+      <span class="label" style="transform: rotate(2deg);">兴趣爱好</span>
+    </div>
+
+    <div class="hero">
+      <img class="hero-banner" src="frame1.png" alt="Portfolio">
+    </div>
+
+    <div class="dock" id="dock">
+      <div class="dock-item" title="启动台" data-dock="launchpad"><img src="img-launchpad.png" alt="启动台"></div>
+      <div class="dock-item" title="通讯录 · 电话" data-dock="contacts"><img src="img-contacts.png" alt="通讯录"></div>
+      <div class="dock-item" title="信息 · 微信" data-dock="messages"><img src="img-messages.png" alt="信息"></div>
+      <div class="dock-item" title="邮件 · 邮箱" data-dock="mail"><img src="img-mail.png" alt="邮件"></div>
+      <div class="dock-item" title="备忘录 · 留言板" data-dock="notes"><img src="img-notes.png" alt="备忘录"></div>
+      <div class="dock-item" title="废纸篓 · 碎碎念" data-dock="trash"><img src="img-trash.png" alt="废纸篓"></div>
+    </div>
+  </div>
+
+  <!-- ===== ABOUT ===== -->
+  <div class="page" id="page-about">
+    <div class="subpage">
+      <div class="crumb-bar">
+        <span>Portfolio</span><i>/</i><span class="crumb-active">About Me</span><i>/</i><span>2026</span>
+      </div>
+      <div class="container">
+        <button class="back-btn" data-nav="home">← Portfolio</button>
+
+        <div class="about-intro-grid">
+          <img class="about-avatar" src="src/imports/ChatGPT_Image_2026_8_27__23_11_53.png" alt="龚小菲">
+          <div class="about-intro">
+            <h1>Hi! I'm 龚小菲</h1>
+            <p>24 岁，来自四川，现居杭州。浙江大学软件学院工业设计工程硕士在读，专注于 AI 产品、设计工程与 vibe coding 的交叉地带。本科园林设计出身，一路跨界走向产品与技术；曾在京东、腾讯、爱奇艺担任 AI 产品经理，相信设计的本质是解决问题，热爱用技术驱动创意。</p>
+            <div class="chips">
+              <span class="chip">AI 产品</span>
+              <span class="chip">Vibe Coding</span>
+              <span class="chip">AIGC 创作</span>
+              <span class="chip">设计工程</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-card">
+          <p class="sec-title">Profile</p>
+          <div class="profile-grid">
+            <div class="profile-row"><span class="profile-k">姓名</span><span class="profile-v">龚小菲 · Finis Gong</span></div>
+            <div class="profile-row"><span class="profile-k">年龄</span><span class="profile-v">24 岁</span></div>
+            <div class="profile-row"><span class="profile-k">籍贯</span><span class="profile-v">中国 · 四川</span></div>
+            <div class="profile-row"><span class="profile-k">现居</span><span class="profile-v">浙江 · 杭州</span></div>
+            <div class="profile-row"><span class="profile-k">教育</span><span class="profile-v">浙江大学软件学院 · 工业设计工程（硕士在读）</span></div>
+            <div class="profile-row"><span class="profile-k">求职意向</span><span class="profile-v">AI 产品经理 / 设计工程</span></div>
+            <div class="profile-row"><span class="profile-k">电话</span><span class="profile-v">18008199877</span></div>
+            <div class="profile-row"><span class="profile-k">邮箱</span><span class="profile-v">386476092@qq.com</span></div>
+            <div class="profile-row"><span class="profile-k">微信</span><span class="profile-v">gxf03079877</span></div>
+          </div>
+        </div>
+
+        <div class="two-col left-heavy">
+          <div>
+            <p class="sec-title">My Approach</p>
+            <h2 class="sec-head">策略先行，技术驱动创意</h2>
+            <div class="approach-item">
+              <div class="approach-dot">1</div>
+              <div class="approach-text"><h4>用户洞察</h4><p>从真实场景出发，挖掘用户痛点与需求缺口</p></div>
+            </div>
+            <div class="approach-item">
+              <div class="approach-dot">2</div>
+              <div class="approach-text"><h4>方案设计</h4><p>用大模型 + 工程化思维构建可落地的产品方案</p></div>
+            </div>
+            <div class="approach-item">
+              <div class="approach-dot">3</div>
+              <div class="approach-text"><h4>数据验证</h4><p>A/B 实验驱动，用数据闭环持续优化</p></div>
+            </div>
+          </div>
+          <div>
+            <p class="sec-title">Results & Growth</p>
+            <div class="data-row" style="margin-top:20px">
+              <div class="data-circle"><div class="num">197%</div><div class="lbl">CTR 增长</div></div>
+              <div class="data-circle"><div class="num">90%+</div><div class="lbl">准确率/召回率</div></div>
+              <div class="data-circle"><div class="num">5w+</div><div class="lbl">单条视频点赞</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-bottom:64px">
+          <p class="sec-title">Education</p>
+          <h2 class="sec-head">教育经历</h2>
+          <div class="edu-card">
+            <div class="edu-head">
+              <div>
+                <div class="edu-school">浙江大学（985）</div>
+                <div class="edu-meta">软件学院 · 硕士研究生 · 工业设计工程</div>
+              </div>
+              <span class="edu-period">2024.09 — 2027.06（预计）</span>
+            </div>
+            <div class="grade-chips">
+              <span class="grade-chip">智能设计 <strong>99</strong></span>
+              <span class="grade-chip">设计研究新设计 <strong>95</strong></span>
+              <span class="grade-chip">整合与创新设计 <strong>93</strong></span>
+              <span class="grade-chip">设计工程学 <strong>93</strong></span>
+              <span class="grade-chip">产品创新与商业模式 <strong>90</strong></span>
+            </div>
+            <div class="edu-note">宣传部部长 · 主导学院活动策划与公众号运营，独立完成年度宣传视频拍摄与剪辑，播放量 900+，同比曝光量增长 100%</div>
+          </div>
+          <div class="edu-card">
+            <div class="edu-head">
+              <div>
+                <div class="edu-school">四川农业大学（211）</div>
+                <div class="edu-meta">风景园林学院 · 本科 · 园林设计</div>
+              </div>
+              <span class="edu-period">2020.09 — 2024.06</span>
+            </div>
+            <div class="grade-chips">
+              <span class="grade-chip">园林规划与设计 <strong>95</strong></span>
+              <span class="grade-chip">大学英语 <strong>96</strong></span>
+              <span class="grade-chip">高等数学 <strong>93</strong></span>
+              <span class="grade-chip">计算机辅助设计 <strong>92</strong></span>
+            </div>
+            <div class="edu-note">女篮队队长 · 带队获女篮冠军 | 组织部成员</div>
+          </div>
+        </div>
+
+        <div style="margin-bottom:64px">
+          <p class="sec-title">Awards</p>
+          <h2 class="sec-head">获奖荣誉</h2>
+          <div class="award-chips">
+            <span class="award-chip">A'design Award 银奖</span>
+            <span class="award-chip">A'design Award 铜奖</span>
+            <span class="award-chip">优秀研究生</span>
+            <span class="award-chip">五好研究生</span>
+            <span class="award-chip">优秀团干部</span>
+            <span class="award-chip">学院宣传部优秀干事</span>
+            <span class="award-chip">年度运动队优秀队员&队长</span>
+            <span class="award-chip">社会实践优秀团队</span>
+          </div>
+        </div>
+
+        <div style="margin-bottom:64px">
+          <p class="sec-title">Skills</p>
+          <h2 class="sec-head">技能</h2>
+          <div class="skills-grid">
+            <div class="skill-card">
+              <div class="skill-title">AI 工具链</div>
+              <div class="skill-item">Vibe Coding</div>
+              <div class="skill-item">Midjourney</div>
+              <div class="skill-item">Runway</div>
+              <div class="skill-item">AIGC内容生成</div>
+            </div>
+            <div class="skill-card">
+              <div class="skill-title">产品设计</div>
+              <div class="skill-item">PRD 撰写</div>
+              <div class="skill-item">用户调研</div>
+              <div class="skill-item">功能设计</div>
+              <div class="skill-item">Agent建设</div>
+            </div>
+            <div class="skill-card">
+              <div class="skill-title">数据分析</div>
+              <div class="skill-item">数据清洗</div>
+              <div class="skill-item">评测体系构建</div>
+              <div class="skill-item">竞品分析</div>
+              <div class="skill-item">A/B 实验</div>
+            </div>
+            <div class="skill-card">
+              <div class="skill-title">语言</div>
+              <div class="skill-item">中文（母语）</div>
+              <div class="skill-item">英语（CET-6）</div>
+            </div>
+            <div class="skill-card">
+              <div class="skill-title">软技能</div>
+              <div class="skill-item">跨部门协作</div>
+              <div class="skill-item">项目管理与统筹</div>
+              <div class="skill-item">创意策划与执行</div>
+              <div class="skill-item">用户洞察与分析</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PROJECTS ===== -->
+  <div class="page" id="page-projects">
+    <div class="subpage">
+      <div class="crumb-bar">
+        <span>Portfolio</span><i>/</i><span class="crumb-active">Work Experience</span><i>/</i><span>2026</span>
+      </div>
+      <div class="container">
+        <button class="back-btn" data-nav="home">← Portfolio</button>
+        <div class="sub-hero">
+          <h1 class="handwriting">My Experience</h1>
+          <p class="sub-lead">AI 产品经理 · 内容运营 · 实习经历</p>
+        </div>
+
+        <div class="exp-divider">
+          <h2>实习经历</h2>
+          <p>4 段实习经历 · 展开查看主要职责与实习细节，或点击「查看详细」</p>
+        </div>
+
+        <div class="job-card">
+          <div class="job-head" data-job="jd">
+            <div class="job-head-left">
+              <img class="job-logo" src="logo-jd.png" alt="京东">
+              <div><div class="job-company">京东</div><div class="job-role">AI 产品经理 · 2026.06 - 2026.08</div></div>
+            </div>
+            <span class="job-arrow">›</span>
+          </div>
+          <div class="job-body">
+            <div style="padding:20px 0">
+              <div class="intern-summary">
+                <div>
+                  <div class="intern-summary-label">主要职责</div>
+                  <div class="intern-summary-text">负责本地生活场景下的在线对话式AI客服与语音通话AI客服的产品建设与迭代优化</div>
+                </div>
+                <button class="view-detail-btn" data-intern="jd">查看详细 →</button>
+              </div>
+              <div class="duty-block"><div class="duty-tag">Agent能力建设</div><div class="duty-text">针对Prompt优化边际收益递减问题，设计金牌客服Skill蒸馏方案，Skill上线后累计转人工率降低2.03pp；同步推进知识挖掘与自动归因，迭代Prompt与知识库，推动转人工率分别降低2.80pp、1.67pp。</div></div>
+              <div class="duty-block"><div class="duty-tag">语音Agent评测</div><div class="duty-text">从0到1搭建语音Agent质量评测体系，建立Badcase标注框架，利用大模型完成数据解析、自动标注、结果校验及可视化报告生成；定位播报拼接、反问复读、重复索参等高频问题，并推动满意度度量体系落地。</div></div>
+              <div class="duty-block"><div class="duty-tag">数据分析与需求设计</div><div class="duty-text">基于Agent会话、业务指标及人工客服会话数据开展定量/定性分析，通过指标异常、用户行为及Badcase聚类定位需求核心问题，以数据验证需求价值并支撑订单列表、Agent意图框架、语音Agent满意度等方案设计，形成完整产品闭环。</div></div>
+              <div class="duty-block"><div class="duty-tag">AI工作提效</div><div class="duty-text">将vibe coding融入数据分析与产品工作流，开发自动提数Skill、数据监测看板、语音Badcase标注工具等；累计产出7份A/B实验报告、3版自动归因报告、2份知识挖掘报告。</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="job-card">
+          <div class="job-head" data-job="tx">
+            <div class="job-head-left">
+              <img class="job-logo" src="logo-tencent.png" alt="腾讯">
+              <div><div class="job-company">腾讯</div><div class="job-role">AI 产品经理 · 2026.03 - 2026.06</div></div>
+            </div>
+            <span class="job-arrow">›</span>
+          </div>
+          <div class="job-body">
+            <div style="padding:20px 0">
+              <div class="intern-summary">
+                <div>
+                  <div class="intern-summary-label">主要职责</div>
+                  <div class="intern-summary-text">负责混元多模态模型语音方向（ASR、TTS）的模型评测与自动化评测探索</div>
+                </div>
+                <button class="view-detail-btn" data-intern="tx">查看详细 →</button>
+              </div>
+              <div class="duty-block"><div class="duty-tag">设计自动化Agent</div><div class="duty-text">针对传统人工归因成本高、LLM单轮多任务导致准确率不足的挑战，设计自动归因Agent方案，实现ASR语音标注自动化预处理，评测周期缩短50%，实现评测数据的自动化预处理。</div></div>
+              <div class="duty-block"><div class="duty-tag">优化ASR评测框架</div><div class="duty-text">针对原有评测无法覆盖复杂上下文场景、错误权重失真的痛点，重构ASR评测框架，优化ASR评测框架，建立多维度、可量化的分级评测体系。使原本无法判定的案例中超90%得到有效判断，评测覆盖率大幅提升。</div></div>
+              <div class="duty-block"><div class="duty-tag">TTS竞品评测</div><div class="duty-text">设计TTS竞品评测方案，覆盖多维度音质与表现力评估，建立可复用的竞品评测方案。</div></div>
+              <div class="duty-block"><div class="duty-tag">制定评测方案</div><div class="duty-text">深度参与ASR、TTS语音数据集的精细化评测方案制定，管理数据标注任务与培训数据标注人力。</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="job-card">
+          <div class="job-head" data-job="iqiyi">
+            <div class="job-head-left">
+              <img class="job-logo" src="logo-iqiyi.jpg" alt="爱奇艺">
+              <div><div class="job-company">爱奇艺</div><div class="job-role">AI 产品经理 · 2025.09 - 2026.01</div></div>
+            </div>
+            <span class="job-arrow">›</span>
+          </div>
+          <div class="job-body">
+            <div style="padding:20px 0">
+              <div class="intern-summary">
+                <div>
+                  <div class="intern-summary-label">主要职责</div>
+                  <div class="intern-summary-text">负责针对电影、电视剧、综艺进行二创的AI剪辑、创作工具的产品建设与迭代优化</div>
+                </div>
+                <button class="view-detail-btn" data-intern="iqiyi">查看详细 →</button>
+              </div>
+              <div class="duty-block"><div class="duty-tag">设计自动生产工作流</div><div class="duty-text">针对海外短剧短视频创作高度依赖人工、原有产线片段跳跃的痛点，规划多套AI自动化创作工作流，通过对齐底层数据结构并设计异常处理与降级兜底策略，推动工作流成功上线，实现素材的规模化自动生产，核心指标增长87%。</div></div>
+              <div class="duty-block"><div class="duty-tag">建设解说视频Agent</div><div class="duty-text">为了解决AI视频生成稳定性不足、人工协同编辑效率低的痛点，独立完成了影视解说视频的生产Agent规划与生产后字幕画布与分镜级编辑功能，赋予了AIGC视频一站式可控操作体验，实现产出视频日均播放量增长93%，万赞视频数增长82%。</div></div>
+              <div class="duty-block"><div class="duty-tag">应用与设计RAG</div><div class="duty-text">针对爆款视频高度依赖人工经验复刻、缺乏沉淀的局限，主导爆文剪辑模板知识库设计，多维构建可扩展字段体系，规划"向量+标量"混合检索方案以解决检索不准确问题，并通过去重及优质模板回流机制精简结构；针对影视剧混剪中常出现镜头片段跳跃、关键情节缺失的问题，明确三层级边界规则并构建事件知识库，通过设计自动化入库流程与镜头所属事件精准判断。</div></div>
+              <div class="duty-block"><div class="duty-tag">团队协作</div><div class="duty-text">与投放团队、内容团队、技术团队协作沟通，推动产品在实际用户场景中的可用性与稳定性提升。</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="job-card">
+          <div class="job-head" data-job="jiaren">
+            <div class="job-head-left">
+              <img class="job-logo" src="logo-jiaren.png" alt="嘉人">
+              <div><div class="job-company">嘉人 Marie Claire</div><div class="job-role">内容运营 · 2025.05 - 2025.08</div></div>
+            </div>
+            <span class="job-arrow">›</span>
+          </div>
+          <div class="job-body">
+            <div style="padding:20px 0">
+              <div class="intern-summary">
+                <div>
+                  <div class="intern-summary-label">主要职责</div>
+                  <div class="intern-summary-text">负责嘉人小红书官方账号和附属宠物账号的运营与内容创作</div>
+                </div>
+                <button class="view-detail-btn" data-intern="jiaren">查看详细 →</button>
+              </div>
+              <div class="duty-block"><div class="duty-tag">提升账号涨粉效率</div><div class="duty-text">负责嘉人小红书官方账号和附属宠物账号运营，使用AIGC进行内容相关创作，运营期间实现官方账号涨粉4w+。从0到1搭建附属宠物账号，通过AI内容制作实现粉丝1000+。</div></div>
+              <div class="duty-block"><div class="duty-tag">热点视频创意策划</div><div class="duty-text">独立承担视频创意方案策划、拍摄执行与传播内容设计，确保品牌调性与用户兴趣结合，结合热点话题进行节奏化传播，单次活动视频阅读量超百万，小红书热点榜单持续上榜48h，热度最高top4，单条活动视频在小红书收获5w+点赞。</div></div>
+              <div class="duty-block"><div class="duty-tag">内容创作</div><div class="duty-text">独立完成小红书账号的视频内容与图文内容创作以及每周公众号时尚资讯推文编写，提高阅读量和用户粘性。</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== 项目经历 (moved to intern detail pages) ===== -->
+        <div class="exp-divider proj-section">
+          <h2>项目经历</h2>
+          <p>9 个项目 · 每个项目含流程图可视化与背景/目标/行动/结果完整说明</p>
+        </div>
+
+        <div class="proj-item">
+          <div class="proj-item-head">
+            <div class="proj-item-head-left">
+              <div class="proj-item-title">嘉人开麦 × Omega品牌活动创意策划</div>
+              <div class="proj-item-time">嘉人 · 内容运营</div>
+            </div>
+            <span class="proj-item-badge">2w+ 点赞</span>
+          </div>
+          <div class="proj-item-body">
+            <div class="flow">
+              <div class="flow-node"><div class="flow-stage">背景</div><div class="flow-key">打造新栏目IP</div></div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-node goal"><div class="flow-stage">目标</div><div class="flow-key">从0到1策划落地</div></div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-node action"><div class="flow-stage">行动</div><div class="flow-key">2个环节</div></div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-node result"><div class="flow-stage">结果</div><div class="flow-key">2w+点赞开门红</div></div>
+            </div>
+            <div class="proj-detail-block"><span class="proj-detail-label bg">背景</span><p class="proj-detail-text">需要为品牌客户打造一档全新的商业化栏目IP，以突破传统的营销方式，提升用户粘性。</p></div>
+            <div class="proj-detail-block"><span class="proj-detail-label goal">目标</span><p class="proj-detail-text">从0到1策划并开创「嘉人开麦」新栏目，负责其策划、视觉定位的设定，并完成首期的落地。</p></div>
+            <div class="proj-detail-block"><span class="proj-detail-label action">行动</span><ul class="proj-detail-list"><li>玩法与规则设计：设计了栏目的基本形式、互动规则和视觉风格，并撰写策划案，向团队和品牌方提案并获得通过。</li><li>上线与效果监控：栏目上线后，监控首发视频的核心数据，分析用户互动评论，评估栏目初期表现。</li></ul></div>
+            <div class="proj-detail-block"><span class="proj-detail-label result">结果</span><p class="proj-detail-text">新栏目首发视频即收获2w+点赞，实现"开门红"，成功为品牌开辟了新的内容阵地。</p></div>
+          </div>
+        </div>
+
+        <div class="proj-item">
+          <div class="proj-item-head">
+            <div class="proj-item-head-left">
+              <div class="proj-item-title">馥绿德雅商业直播活动</div>
+              <div class="proj-item-time">嘉人 · 内容运营</div>
+            </div>
+            <span class="proj-item-badge">2w+ 观看</span>
+          </div>
+          <div class="proj-item-body">
+            <div class="flow">
+              <div class="flow-node"><div class="flow-stage">背景</div><div class="flow-key">提升直播转化</div></div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-node goal"><div class="flow-stage">目标</div><div class="flow-key">竞品分析+脚本设计</div></div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-node action"><div class="flow-stage">行动</div><div class="flow-key">3个环节</div></div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-node result"><div class="flow-stage">结果</div><div class="flow-key">2w+观看人数</div></div>
+            </div>
+            <div class="proj-detail-block"><span class="proj-detail-label bg">背景</span><p class="proj-detail-text">参与馥绿德雅品牌洗护发产品的商业直播项目，目标是提升直播观看人数、用户停留时长。</p></div>
+            <div class="proj-detail-block"><span class="proj-detail-label goal">目标</span><p class="proj-detail-text">进行竞品分析并参与直播脚本与互动环节的设计，以优化流量转化效率。</p></div>
+            <div class="proj-detail-block"><span class="proj-detail-label action">行动</span><ul class="proj-detail-list"><li>竞品分析：我横向分析了Vogue、芭莎等竞对的直播活动，从福利设置、互动节奏、主播话术等维度进行对比，输出分析报告。</li><li>策略制定：基于分析结论，我提议优化抽奖环节的触发机制（评论关键词），并设计了关于产品功效的问答互动脚本，以提升用户停留时长。</li><li>数据支持：我梳理了品牌方提供的用户画像数据与产品评论，提炼出用户对"提升色泽功效"的核心关注点，并将其融入明星嘉宾的话术设计中。</li></ul></div>
+            <div class="proj-detail-block"><span class="proj-detail-label result">结果</span><p class="proj-detail-text">我提出的优化方案被采纳并实施，直播观看人数达2w+，活动圆满完成。</p></div>
+          </div>
+        </div>
+
+        <div class="proj-item">
+          <div class="proj-item-head">
+            <div class="proj-item-head-left">
+              <div class="proj-item-title">赵今麦 × MIUMIU品牌活动创意宣传策划与执行</div>
+              <div class="proj-item-time">嘉人 · 内容运营</div>
+            </div>
+            <span class="proj-item-badge">5w+ 点赞</span>
+          </div>
+          <div class="proj-item-body">
+            <div class="flow">
+              <div class="flow-node"><div class="flow-stage">背景</div><div class="flow-key">提升品牌曝光口碑</div></div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-node goal"><div class="flow-stage">目标</div><div class="flow-key">创意+发布+复盘</div></div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-node action"><div class="flow-stage">行动</div><div class="flow-key">3个环节</div></div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-node result"><div class="flow-stage">结果</div><div class="flow-key">5w+点赞百万曝光</div></div>
+            </div>
+            <div class="proj-detail-block"><span class="proj-detail-label bg">背景</span><p class="proj-detail-text">独立负责明星赵今麦与MIUMIU品牌合作活动的线上内容策划与传播，目标是提升品牌在小红书平台的曝光量与正面口碑。</p></div>
+            <div class="proj-detail-block"><span class="proj-detail-label goal">目标</span><p class="proj-detail-text">策划创意视频内容、安排发布节奏，并对最终传播效果进行复盘。</p></div>
+            <div class="proj-detail-block"><span class="proj-detail-label action">行动</span><ul class="proj-detail-list"><li>内容策划与执行：我分析了小红书平台的热点趋势和MIUMIU的品牌调性，策划了"ABB"的主题视频，独立完成拍摄协调与剪辑。</li><li>发布策略：我制定了分时段、带热门话题的发布策略，并在发布后持续监控评论区舆情。</li><li>效果复盘：活动结束后，我使用Excel对视频的播放量、点赞率、分享数等数据进行了多维度复盘，分析了爆款因素。</li></ul></div>
+            <div class="proj-detail-block"><span class="proj-detail-label result">结果</span><p class="proj-detail-text">该条视频成为爆款，最终收获5w+点赞，曝光量超百万，远超预期目标。</p></div>
+          </div>
+        </div>
+
+        <div class="proj-item">
+          <div class="proj-item-head">
+            <div class="proj-item-head-left">
+              <div class="proj-item-title">短剧广告自动化素材生产AI工作流</div>
+              <div class="proj-item-time">爱奇艺 · AI 产品</div>
+            </div>
+            <span class="proj-item-badge">CTR +197%</span>
+          </div>
+          <div class="proj-item-body">
+            <div class="flow">
+              <div class="flow-node"><div class="flow-stage">背景</div><div class="flow-key">人工剪辑成本高</div></div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-node goal"><div class="flow-stage">目标</div><div class="flow-key">规模化自动生产</div></div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-node action"><div class="flow-stage">行动</div><div class="flow-key">4个环节</div></div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-node result"><div class="flow-stage">结果</div><div class="flow-key">CTR增长197%</div></div>
+            </div>
+            <div class="proj-detail-block"><span class="proj-detail-label bg">背景</span><p class="proj-detail-text">海外短剧在海外平台的买量素材高度依赖人工剪辑，生产成本高，且难以规模化产出与复刻创意，原有产线产出视频片段跳跃、不连贯；单集所包含内容会有多个剧情线或场景的情况出现，业务侧缺乏可有效的、自动化生产短剧广告投放素材的工作流。</p></div>
+            <div class="proj-detail-block"><span class="proj-detail-label goal">目标</span><p class="proj-detail-text">从产品视角梳理海外高转化短剧素材的共性规律，为海外短剧业务设计自动化生产功能，搭建可规模化自动生产的AI工作流。</p></div>
+            <div class="proj-detail-block"><span class="proj-detail-label action">行动</span><ul class="proj-detail-list"><li>系统调研海外短视频平台近半年高曝光、高下载的短剧素材，分析素材结构、叙事方式与钩子设计，总结高复用的视频结构。</li><li>提出以「事件」为核心的剪辑创作模式，将零散剧情抽象为完整、有因果关系的结构化事件单元，以此搭建了事件知识库。</li><li>规划多套AI创作工作流，覆盖用户意图解析、事件检索、钩子识别、片段拼接、多语言字幕生成等关键环节。</li><li>撰写PRD文档进行评审后，与开发的同学沟通工作流细节与逻辑，成功搭建了两条工作流并进行测试评估，推出上线使用。</li></ul></div>
+            <div class="proj-detail-block"><span class="proj-detail-label result">结果</span><p class="proj-detail-text">有效提升了海外商业化内容投放质量，投放首周核心指标增长87%，CTR增长197%。</p></div>
+          </div>
+        </div>
+
+        <div class="proj-item">
+          <div class="proj-item-head">
+            <div class="proj-item-head-left">
+              <div class="proj-item-title">影视剧二创短视频创作Agent</div>
+              <div class="proj-item-time">爱奇艺 · 2025.12 - 2026.01</div>
+            </div>
+            <span class="proj-item-badge">播放 +93%</span>
+          </div>
+          <div class="proj-item-body">
+            <div class="flow">
+              <div class="flow-node"><div class="flow-stage">背景</div><div class="flow-key">产线分散不可编辑</div></div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-node goal"><div class="flow-stage">目标</div><div class="flow-key">可编辑子Agent</div></div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-node action"><div class="flow-stage">行动</div><div class="flow-key">4个环节</div></div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-node result"><div class="flow-stage">结果</div><div class="flow-key">播放量增长93%</div></div>
+            </div>
+            <div class="proj-detail-block"><span class="proj-detail-label bg">背景</span><p class="proj-detail-text">在影视剧二创短视频的内容生产中，自动化创作的多条产线入口分散，且不支持视频编辑，对于需要精细优化的视频无法支持用户手动编辑调整。</p></div>
+            <div class="proj-detail-block"><span class="proj-detail-label goal">目标</span><p class="proj-detail-text">搭建可编辑的影视剧解说类创作子Agent，实现从解说生成到视频拼接的自动化流程，同时保证生成内容在质量上的可控性，满足用户的编辑需求。</p></div>
+            <div class="proj-detail-block"><span class="proj-detail-label action">行动</span><ul class="proj-detail-list"><li>负责解说Agent的产品方案设计，通过Agent实现解说内容的智能化生产</li><li>提出以爆文衍生的方式进行解说类视频创作</li><li>主导P0需求拆解与PRD撰写，包括Agent搭建以及解说字幕画布、分镜编辑能力，以及语音重生成后的视频时长自适应方案</li><li>协同前后端规划音色调整、语音时长提示与预览交互，提升创作内容的可控性与可用性</li></ul></div>
+            <div class="proj-detail-block"><span class="proj-detail-label result">结果</span><p class="proj-detail-text">有效提升了运营团队的生产效率与生产质量，业务方发布数量提升27%，日均播放量增长93%，万赞视频数增长82%。</p></div>
+          </div>
+        </div>
+
+        <div class="proj-item">
+          <div class="proj-item-head">
+            <div class="proj-item-head-left">
+              <div class="proj-item-title">ASR自动归因Agent建设</div>
+              <div class="proj-item-time">腾讯 · 2026.03</div>
+            </div>
+            <span class="proj-item-badge">周期 -50%</span>
+          </div>
+          <div class="proj-item-body">
+            <div class="flow">
+              <div class="flow-node"><div class="flow-stage">背景</div><div class="flow-key">人工标注周期长</div></div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-node goal"><div class="flow-stage">目标</div><div class="flow-key">自动化归因工具</div></div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-node action"><div class="flow-stage">行动</div><div class="flow-key">4层Prompt架构</div></div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-node result"><div class="flow-stage">结果</div><div class="flow-key">周期缩短50%</div></div>
+            </div>
+            <div class="proj-detail-block"><span class="proj-detail-label bg">背景</span><p class="proj-detail-text">现有ASR错误归因依赖传统人工逐条标注，评测周期长、样本规模受限，无法支撑模型快速迭代需求。</p></div>
+            <div class="proj-detail-block"><span class="proj-detail-label goal">目标</span><p class="proj-detail-text">构建面向ASR评测场景的自动化归因工具，实现对批量评测数据的自动化处理，压缩评测周期，降低评测人力消耗。</p></div>
+            <div class="proj-detail-block"><span class="proj-detail-label action">行动</span><ul class="proj-detail-list"><li>设计「规则过滤+自动归因」架构，将确定性任务（文本规范化、差异检测、规则前置过滤、输出装配）交由纯代码实现。</li><li>拆分Stage1错误判定、Stage2句意影响、Stage3错误归因、Stage4关联性判定为4层prompt。</li><li>建立规则前置过滤层，通过固定规则拦截25%–40%的无需标注类型。</li><li>设计人工平台人机协同校验方案。</li></ul></div>
+            <div class="proj-detail-block"><span class="proj-detail-label result">结果</span><p class="proj-detail-text">同人力条件下评测周期缩短50%，实现评测数据的自动化预处理。</p></div>
+          </div>
+        </div>
+
+        <div class="proj-item">
+          <div class="proj-item-head">
+            <div class="proj-item-head-left">
+              <div class="proj-item-title">ASR评测体系优化</div>
+              <div class="proj-item-time">腾讯 · 2026.04</div>
+            </div>
+            <span class="proj-item-badge">90%+ 可判定</span>
+          </div>
+          <div class="proj-item-body">
+            <div class="flow">
+              <div class="flow-node"><div class="flow-stage">背景</div><div class="flow-key">53%无法判定</div></div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-node goal"><div class="flow-stage">目标</div><div class="flow-key">多维度分级体系</div></div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-node action"><div class="flow-stage">行动</div><div class="flow-key">4个维度</div></div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-node result"><div class="flow-stage">结果</div><div class="flow-key">超90%可判定</div></div>
+            </div>
+            <div class="proj-detail-block"><span class="proj-detail-label bg">背景</span><p class="proj-detail-text">原有ASR评测采用单维度粗粒度评估，评测体系无法覆盖复杂场景下的问题标注导致53%的case无法有效判定模型优劣。</p></div>
+            <div class="proj-detail-block"><span class="proj-detail-label goal">目标</span><p class="proj-detail-text">优化ASR评测框架，建立多维度、可量化的分级评测体系，提升评测覆盖率与诊断深度，为算法迭代提供精准的方向性指引。</p></div>
+            <div class="proj-detail-block"><span class="proj-detail-label action">行动</span><ul class="proj-detail-list"><li>引入上下文信息这一评估维度。</li><li>建立四级句意影响等级，三级格式影响等级。</li><li>制定ASR Badcase问题归因标注规则，包括10类根因体系（噪声干扰、多人重叠、头/尾丢音等）。</li><li>支持按维度独立统计分析。</li></ul></div>
+            <div class="proj-detail-block"><span class="proj-detail-label result">结果</span><p class="proj-detail-text">使原本无法判定的案例中超90%得到有效判断，评测覆盖率大幅提升；形成可量化的严重程度分级机制，为算法优化提供了更清晰的优先级。</p></div>
+          </div>
+        </div>
+
+        <div class="proj-item">
+          <div class="proj-item-head">
+            <div class="proj-item-head-left">
+              <div class="proj-item-title">金牌客服决策蒸馏与Agent Skill建设</div>
+              <div class="proj-item-time">京东 · 2026.08</div>
+            </div>
+            <span class="proj-item-badge">转人工 -2.03pp</span>
+          </div>
+          <div class="proj-item-body">
+            <div class="flow">
+              <div class="flow-node"><div class="flow-stage">背景</div><div class="flow-key">Prompt边际递减</div></div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-node goal"><div class="flow-stage">目标</div><div class="flow-key">经验转Skill</div></div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-node action"><div class="flow-stage">行动</div><div class="flow-key">3个环节</div></div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-node result"><div class="flow-stage">结果</div><div class="flow-key">转人工-2.03pp</div></div>
+            </div>
+            <div class="proj-detail-block"><span class="proj-detail-label bg">背景</span><p class="proj-detail-text">在持续Prompt优化后，部分Agent问题已由语言表达和意图理解转向复杂业务场景下的决策能力问题，传统 Prompt 调优边际收益下降；同时，优秀人工客服拥有大量尚未结构化沉淀的业务决策经验。</p></div>
+            <div class="proj-detail-block"><span class="proj-detail-label goal">目标</span><p class="proj-detail-text">将金牌客服的隐性业务经验转化为Agent可执行的Skill，使Agent不仅学习客服的回复话术，还能够学习其决策逻辑和判断风格。</p></div>
+            <div class="proj-detail-block"><span class="proj-detail-label action">行动</span><ul class="proj-detail-list"><li>设计"通识蒸馏+环境适配"的Skill蒸馏方案，在与 Agent 相同的上下文、工具及能力约束下采集金牌客服回复；</li><li>利用大模型从专家回复中提取Work（工作决策逻辑）+ Persona（判断风格），形成结构化 Skill；</li><li>通过多轮迭代将Skill注入线上Agent Prompt，通过A/B实验验证实际效果。</li></ul></div>
+            <div class="proj-detail-block"><span class="proj-detail-label result">结果</span><p class="proj-detail-text">上线Skill的售中和售后Agent转人工率分别降低2.03pp和1.19pp，验证了项目的可行性，并沉淀了可复用的Agent Skill蒸馏方法。</p></div>
+          </div>
+        </div>
+
+        <div class="proj-item">
+          <div class="proj-item-head">
+            <div class="proj-item-head-left">
+              <div class="proj-item-title">家政Agent知识挖掘</div>
+              <div class="proj-item-time">京东 · 2026.07 - 2026.08</div>
+            </div>
+            <span class="proj-item-badge">转人工 -2.80pp</span>
+          </div>
+          <div class="proj-item-body">
+            <div class="flow">
+              <div class="flow-node"><div class="flow-stage">背景</div><div class="flow-key">知识覆盖不足</div></div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-node goal"><div class="flow-stage">目标</div><div class="flow-key">持续迭代机制</div></div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-node action"><div class="flow-stage">行动</div><div class="flow-key">三层漏斗框架</div></div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-node result"><div class="flow-stage">结果</div><div class="flow-key">转人工-2.80pp</div></div>
+            </div>
+            <div class="proj-detail-block"><span class="proj-detail-label bg">背景</span><p class="proj-detail-text">家政业务经常拓展新的业务，Agent在新业务场景中存在知识覆盖不足问题，缺乏一个快速搭建新业务Agent的途径来解决用户进线自咨询新业务的问题。</p></div>
+            <div class="proj-detail-block"><span class="proj-detail-label goal">目标</span><p class="proj-detail-text">从人工客服真实对话中挖掘Agent未覆盖的业务知识，建立"知识发现—筛选—注入—效果验证"的持续迭代机制，推动Agent知识体系自进化。</p></div>
+            <div class="proj-detail-block"><span class="proj-detail-label action">行动</span><ul class="proj-detail-list"><li>分析人工客服与用户真实对话，利用大模型识别Agent未覆盖知识点、高频问题及潜在知识缺口。</li><li>建立知识分类、过滤和有效性判断规则，将高价值知识反哺Agent Prompt知识体系。</li><li>通过A/B实验验证知识注入效果。</li><li>形成"知识发现—知识过滤—Agent注入—效果验证"的三层漏斗框架。</li></ul></div>
+            <div class="proj-detail-block"><span class="proj-detail-label result">结果</span><p class="proj-detail-text">售前场景经过多轮知识挖掘后转人工率降低2.80pp；形成可复用的Agent知识挖掘方法论。</p></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== INTERN DETAIL: JD ===== -->
+  <div class="page" id="page-intern-jd">
+    <div class="subpage">
+      <div class="crumb-bar"><span>Portfolio</span><i>/</i><span class="crumb-active">京东实习</span><i>/</i><span>2026</span></div>
+      <div class="container">
+        <button class="back-btn" data-nav="projects">← 工作项目</button>
+        <div class="sub-hero">
+          <h1 class="handwriting">京东 · AI产品经理</h1>
+          <p class="sub-lead">2026.06 - 2026.08 · 本地生活 AI 客服与语音 Agent</p>
+        </div>
+
+        <p class="sec-title">我的能力与思考</p>
+        <h2 class="sec-head">从 Prompt 调优到经验蒸馏</h2>
+        <div class="ability-grid">
+          <div class="ability-card"><div class="ability-icon"><svg class="icon" width="22" height="22" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></div><h3 class="ability-title">Agent能力建设</h3><p class="ability-desc">Prompt 边际收益递减时，转向金牌客服 Skill 蒸馏，从「学话术」升级为「学决策逻辑」，把隐性经验结构化为可执行 Skill。</p></div>
+          <div class="ability-card"><div class="ability-icon"><svg class="icon" width="22" height="22" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.6-2.6L7 14"/></svg></div><h3 class="ability-title">语音Agent评测</h3><p class="ability-desc">从 0 到 1 搭建评测体系，用大模型做自动标注 + 可视化报告，定位播报拼接、反问复读、重复索参等高频问题并推动满意度度量落地。</p></div>
+          <div class="ability-card"><div class="ability-icon"><svg class="icon" width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div><h3 class="ability-title">数据驱动需求</h3><p class="ability-desc">定量定性分析，用指标异常 + Badcase 聚类定位核心问题，以数据验证需求价值，支撑订单列表、意图框架等方案设计，形成产品闭环。</p></div>
+          <div class="ability-card"><div class="ability-icon"><svg class="icon" width="22" height="22" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div><h3 class="ability-title">Vibe Coding提效</h3><p class="ability-desc">把编程融入工作流，自动提数 Skill、数据监测看板、语音 Badcase 标注工具替代重复劳动，累计产出 7 份 A/B 实验报告。</p></div>
+        </div>
+
+        <div class="contrib-box">
+          <p class="sec-title">核心贡献</p>
+          <h3>数据驱动的 Agent 优化闭环</h3>
+          <div class="data-row">
+            <div class="data-circle"><div class="num">-2.03pp</div><div class="lbl">Skill上线转人工率</div></div>
+            <div class="data-circle"><div class="num">-2.80pp</div><div class="lbl">家政知识挖掘</div></div>
+            <div class="data-circle"><div class="num">7份</div><div class="lbl">A/B实验报告</div></div>
+          </div>
+        </div>
+
+        <p class="sec-title">实习概述</p>
+        <div class="wcard" style="margin-bottom:48px"><p style="font-size:15px;color:var(--ref-ink);line-height:1.8">主要职责：负责本地生活场景下的在线对话式AI客服与语音通话AI客服的产品建设与迭代优化。围绕 Agent 能力建设、语音 Agent 评测、数据驱动需求与 AI 工作提效四条主线，推动客服 Agent 从话术复刻走向决策能力沉淀。</p></div>
+
+        <p class="sec-title">项目详解</p>
+        <h2 class="sec-head">2 个核心项目</h2>
+        <div class="proj-item">
+          <div class="proj-item-head open"><div class="proj-item-head-left"><div class="proj-item-title">金牌客服决策蒸馏与Agent Skill建设</div><div class="proj-item-time">京东 · 2026.08</div></div><span class="proj-item-badge">转人工 -2.03pp</span></div>
+          <div class="proj-item-body open">
+            <div class="flow"><div class="flow-node"><div class="flow-stage">背景</div><div class="flow-key">Prompt边际递减</div></div><div class="flow-arrow">→</div><div class="flow-node goal"><div class="flow-stage">目标</div><div class="flow-key">经验转Skill</div></div><div class="flow-arrow">→</div><div class="flow-node action"><div class="flow-stage">行动</div><div class="flow-key">3个环节</div></div><div class="flow-arrow">→</div><div class="flow-node result"><div class="flow-stage">结果</div><div class="flow-key">转人工-2.03pp</div></div></div>
+            <div class="proj-detail-block"><span class="proj-detail-label bg">背景</span><p class="proj-detail-text">在持续Prompt优化后，部分Agent问题已由语言表达和意图理解转向复杂业务场景下的决策能力问题，传统 Prompt 调优边际收益下降；同时，优秀人工客服拥有大量尚未结构化沉淀的业务决策经验。</p></div>
+            <div class="proj-detail-block"><span class="proj-detail-label goal">目标</span><p class="proj-detail-text">将金牌客服的隐性业务经验转化为Agent可执行的Skill，使Agent不仅学习客服的回复话术，还能够学习其决策逻辑和判断风格。</p></div>
+            <div class="proj-detail-block"><span class="proj-detail-label action">行动</span><ul class="proj-detail-list"><li>设计"通识蒸馏+环境适配"的Skill蒸馏方案，在与 Agent 相同的上下文、工具及能力约束下采集金牌客服回复；</li><li>利用大模型从专家回复中提取Work（工作决策逻辑）+ Persona（判断风格），形成结构化 Skill；</li><li>通过多轮迭代将Skill注入线上Agent Prompt，通过A/B实验验证实际效果。</li></ul></div>
+            <div class="proj-detail-block"><span class="proj-detail-label result">结果</span><p class="proj-detail-text">上线Skill的售中和售后Agent转人工率分别降低2.03pp和1.19pp，验证了项目的可行性，并沉淀了可复用的Agent Skill蒸馏方法。</p></div>
+          </div>
+        </div>
+        <div class="proj-item">
+          <div class="proj-item-head open"><div class="proj-item-head-left"><div class="proj-item-title">家政Agent知识挖掘</div><div class="proj-item-time">京东 · 2026.07 - 2026.08</div></div><span class="proj-item-badge">转人工 -2.80pp</span></div>
+          <div class="proj-item-body open">
+            <div class="flow"><div class="flow-node"><div class="flow-stage">背景</div><div class="flow-key">知识覆盖不足</div></div><div class="flow-arrow">→</div><div class="flow-node goal"><div class="flow-stage">目标</div><div class="flow-key">持续迭代机制</div></div><div class="flow-arrow">→</div><div class="flow-node action"><div class="flow-stage">行动</div><div class="flow-key">三层漏斗框架</div></div><div class="flow-arrow">→</div><div class="flow-node result"><div class="flow-stage">结果</div><div class="flow-key">转人工-2.80pp</div></div></div>
+            <div class="proj-detail-block"><span class="proj-detail-label bg">背景</span><p class="proj-detail-text">家政业务经常拓展新的业务，Agent在新业务场景中存在知识覆盖不足问题，缺乏一个快速搭建新业务Agent的途径来解决用户进线自咨询新业务的问题。</p></div>
+            <div class="proj-detail-block"><span class="proj-detail-label goal">目标</span><p class="proj-detail-text">从人工客服真实对话中挖掘Agent未覆盖的业务知识，建立"知识发现—筛选—注入—效果验证"的持续迭代机制，推动Agent知识体系自进化。</p></div>
+            <div class="proj-detail-block"><span class="proj-detail-label action">行动</span><ul class="proj-detail-list"><li>分析人工客服与用户真实对话，利用大模型识别Agent未覆盖知识点、高频问题及潜在知识缺口。</li><li>建立知识分类、过滤和有效性判断规则，将高价值知识反哺Agent Prompt知识体系。</li><li>通过A/B实验验证知识注入效果。</li><li>形成"知识发现—知识过滤—Agent注入—效果验证"的三层漏斗框架。</li></ul></div>
+            <div class="proj-detail-block"><span class="proj-detail-label result">结果</span><p class="proj-detail-text">售前场景经过多轮知识挖掘后转人工率降低2.80pp；形成可复用的Agent知识挖掘方法论。</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== INTERN DETAIL: TX ===== -->
+  <div class="page" id="page-intern-tx">
+    <div class="subpage">
+      <div class="crumb-bar"><span>Portfolio</span><i>/</i><span class="crumb-active">腾讯实习</span><i>/</i><span>2026</span></div>
+      <div class="container">
+        <button class="back-btn" data-nav="projects">← 工作项目</button>
+        <div class="sub-hero">
+          <h1 class="handwriting">腾讯 · AI产品经理</h1>
+          <p class="sub-lead">2026.03 - 2026.06 · 混元 ASR/TTS 评测与自动化</p>
+        </div>
+
+        <p class="sec-title">我的能力与思考</p>
+        <h2 class="sec-head">从人工标注到自动归因</h2>
+        <div class="ability-grid">
+          <div class="ability-card"><div class="ability-icon"><svg class="icon" width="22" height="22" viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20z"/><path d="M8 12h8M12 8v8"/></svg></div><h3 class="ability-title">自动化Agent设计</h3><p class="ability-desc">针对人工归因成本高、LLM 单轮多任务准确率不足，设计「规则过滤 + 自动归因」架构，4 层 Prompt 分层处理，确定性任务交代码。</p></div>
+          <div class="ability-card"><div class="ability-icon"><svg class="icon" width="22" height="22" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div><h3 class="ability-title">评测框架重构</h3><p class="ability-desc">从单维度粗粒度升级为多维度可量化分级体系，引入上下文维度 + 四级句意影响 + 10 类根因，使 53% 无法判定的 case 超 90% 可判定。</p></div>
+          <div class="ability-card"><div class="ability-icon"><svg class="icon" width="22" height="22" viewBox="0 0 24 24"><path d="M16 16l4 4"/><circle cx="11" cy="11" r="7"/></svg></div><h3 class="ability-title">竞品评测</h3><p class="ability-desc">设计 TTS 竞品评测方案，覆盖多维度音质与表现力评估，建立可复用的竞品评测方案，为算法迭代提供方向性指引。</p></div>
+          <div class="ability-card"><div class="ability-icon"><svg class="icon" width="22" height="22" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/></svg></div><h3 class="ability-title">数据标注管理</h3><p class="ability-desc">深度参与 ASR、TTS 语音数据集精细化评测方案制定，管理数据标注任务与培训数据标注人力，保障评测质量。</p></div>
+        </div>
+
+        <div class="contrib-box">
+          <p class="sec-title">核心贡献</p>
+          <h3>评测周期压缩 50%</h3>
+          <div class="data-row">
+            <div class="data-circle"><div class="num">-50%</div><div class="lbl">评测周期缩短</div></div>
+            <div class="data-circle"><div class="num">90%+</div><div class="lbl">原无法判定可判定</div></div>
+            <div class="data-circle"><div class="num">10类</div><div class="lbl">根因体系</div></div>
+          </div>
+        </div>
+
+        <p class="sec-title">实习概述</p>
+        <div class="wcard" style="margin-bottom:48px"><p style="font-size:15px;color:var(--ref-ink);line-height:1.8">主要职责：负责混元多模态模型语音方向（ASR、TTS）的模型评测与自动化评测探索。围绕自动归因 Agent 设计、ASR 评测框架重构、TTS 竞品评测与数据标注管理，推动语音评测从人工走向自动化、从单维度走向多维度分级。</p></div>
+
+        <p class="sec-title">项目详解</p>
+        <h2 class="sec-head">2 个核心项目</h2>
+        <div class="proj-item">
+          <div class="proj-item-head open"><div class="proj-item-head-left"><div class="proj-item-title">ASR自动归因Agent建设</div><div class="proj-item-time">腾讯 · 2026.03</div></div><span class="proj-item-badge">周期 -50%</span></div>
+          <div class="proj-item-body open">
+            <div class="flow"><div class="flow-node"><div class="flow-stage">背景</div><div class="flow-key">人工标注周期长</div></div><div class="flow-arrow">→</div><div class="flow-node goal"><div class="flow-stage">目标</div><div class="flow-key">自动化归因工具</div></div><div class="flow-arrow">→</div><div class="flow-node action"><div class="flow-stage">行动</div><div class="flow-key">4层Prompt架构</div></div><div class="flow-arrow">→</div><div class="flow-node result"><div class="flow-stage">结果</div><div class="flow-key">周期缩短50%</div></div></div>
+            <div class="proj-detail-block"><span class="proj-detail-label bg">背景</span><p class="proj-detail-text">现有ASR错误归因依赖传统人工逐条标注，评测周期长、样本规模受限，无法支撑模型快速迭代需求。</p></div>
+            <div class="proj-detail-block"><span class="proj-detail-label goal">目标</span><p class="proj-detail-text">构建面向ASR评测场景的自动化归因工具，实现对批量评测数据的自动化处理，压缩评测周期，降低评测人力消耗。</p></div>
+            <div class="proj-detail-block"><span class="proj-detail-label action">行动</span><ul class="proj-detail-list"><li>设计「规则过滤+自动归因」架构，将确定性任务（文本规范化、差异检测、规则前置过滤、输出装配）交由纯代码实现。</li><li>拆分Stage1错误判定、Stage2句意影响、Stage3错误归因、Stage4关联性判定为4层prompt。</li><li>建立规则前置过滤层，通过固定规则拦截25%–40%的无需标注类型。</li><li>设计人工平台人机协同校验方案。</li></ul></div>
+            <div class="proj-detail-block"><span class="proj-detail-label result">结果</span><p class="proj-detail-text">同人力条件下评测周期缩短50%，实现评测数据的自动化预处理。</p></div>
+          </div>
+        </div>
+        <div class="proj-item">
+          <div class="proj-item-head open"><div class="proj-item-head-left"><div class="proj-item-title">ASR评测体系优化</div><div class="proj-item-time">腾讯 · 2026.04</div></div><span class="proj-item-badge">90%+ 可判定</span></div>
+          <div class="proj-item-body open">
+            <div class="flow"><div class="flow-node"><div class="flow-stage">背景</div><div class="flow-key">53%无法判定</div></div><div class="flow-arrow">→</div><div class="flow-node goal"><div class="flow-stage">目标</div><div class="flow-key">多维度分级体系</div></div><div class="flow-arrow">→</div><div class="flow-node action"><div class="flow-stage">行动</div><div class="flow-key">4个维度</div></div><div class="flow-arrow">→</div><div class="flow-node result"><div class="flow-stage">结果</div><div class="flow-key">超90%可判定</div></div></div>
+            <div class="proj-detail-block"><span class="proj-detail-label bg">背景</span><p class="proj-detail-text">原有ASR评测采用单维度粗粒度评估，评测体系无法覆盖复杂场景下的问题标注导致53%的case无法有效判定模型优劣。</p></div>
+            <div class="proj-detail-block"><span class="proj-detail-label goal">目标</span><p class="proj-detail-text">优化ASR评测框架，建立多维度、可量化的分级评测体系，提升评测覆盖率与诊断深度，为算法迭代提供精准的方向性指引。</p></div>
+            <div class="proj-detail-block"><span class="proj-detail-label action">行动</span><ul class="proj-detail-list"><li>引入上下文信息这一评估维度。</li><li>建立四级句意影响等级，三级格式影响等级。</li><li>制定ASR Badcase问题归因标注规则，包括10类根因体系（噪声干扰、多人重叠、头/尾丢音等）。</li><li>支持按维度独立统计分析。</li></ul></div>
+            <div class="proj-detail-block"><span class="proj-detail-label result">结果</span><p class="proj-detail-text">使原本无法判定的案例中超90%得到有效判断，评测覆盖率大幅提升；形成可量化的严重程度分级机制，为算法优化提供了更清晰的优先级。</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== INTERN DETAIL: IQIYI ===== -->
+  <div class="page" id="page-intern-iqiyi">
+    <div class="subpage">
+      <div class="crumb-bar"><span>Portfolio</span><i>/</i><span class="crumb-active">爱奇艺实习</span><i>/</i><span>2026</span></div>
+      <div class="container">
+        <button class="back-btn" data-nav="projects">← 工作项目</button>
+        <div class="sub-hero">
+          <h1 class="handwriting">爱奇艺 · AI产品经理</h1>
+          <p class="sub-lead">2025.09 - 2026.01 · 影视二创 AI 剪辑与创作工具</p>
+        </div>
+
+        <p class="sec-title">我的能力与思考</p>
+        <h2 class="sec-head">从人工剪辑到事件化自动生产</h2>
+        <div class="ability-grid">
+          <div class="ability-card"><div class="ability-icon"><svg class="icon" width="22" height="22" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><h3 class="ability-title">AI工作流设计</h3><p class="ability-desc">人工剪辑成本高→以「事件」为核心的剪辑创作模式，规划多套 AI 工作流（意图解析→事件检索→钩子识别→拼接→字幕），设计异常处理与降级兜底。</p></div>
+          <div class="ability-card"><div class="ability-icon"><svg class="icon" width="22" height="22" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div><h3 class="ability-title">Agent建设</h3><p class="ability-desc">产线分散不可编辑→搭建可编辑解说子 Agent，主导 P0 拆解与 PRD，含字幕画布、分镜编辑、语音重生成时长自适应，一站式可控操作。</p></div>
+          <div class="ability-card"><div class="ability-icon"><svg class="icon" width="22" height="22" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div><h3 class="ability-title">RAG应用</h3><p class="ability-desc">爆款经验难复刻→主导爆文模板知识库，多维字段体系 +「向量+标量」混合检索解决检索不准；事件知识库 + 三层边界规则解决镜头跳跃。</p></div>
+          <div class="ability-card"><div class="ability-icon"><svg class="icon" width="22" height="22" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div><h3 class="ability-title">跨团队协作</h3><p class="ability-desc">与投放、内容、技术团队协作沟通，推动产品在实际用户场景中的可用性与稳定性提升，打通从生产到投放的全链路。</p></div>
+        </div>
+
+        <div class="contrib-box">
+          <p class="sec-title">核心贡献</p>
+          <h3>CTR 增长 197%</h3>
+          <div class="data-row">
+            <div class="data-circle"><div class="num">+197%</div><div class="lbl">CTR 增长</div></div>
+            <div class="data-circle"><div class="num">+93%</div><div class="lbl">日均播放量</div></div>
+            <div class="data-circle"><div class="num">+82%</div><div class="lbl">万赞视频数</div></div>
+          </div>
+        </div>
+
+        <p class="sec-title">实习概述</p>
+        <div class="wcard" style="margin-bottom:48px"><p style="font-size:15px;color:var(--ref-ink);line-height:1.8">主要职责：负责针对电影、电视剧、综艺进行二创的AI剪辑、创作工具的产品建设与迭代优化。围绕自动生产工作流、解说视频 Agent、RAG 知识库与跨团队协作，推动海外短剧与影视二创内容从依赖人工走向规模化、可编辑的 AI 自动生产。</p></div>
+
+        <p class="sec-title">项目详解</p>
+        <h2 class="sec-head">2 个核心项目</h2>
+        <div class="proj-item">
+          <div class="proj-item-head open"><div class="proj-item-head-left"><div class="proj-item-title">短剧广告自动化素材生产AI工作流</div><div class="proj-item-time">爱奇艺 · AI 产品</div></div><span class="proj-item-badge">CTR +197%</span></div>
+          <div class="proj-item-body open">
+            <div class="flow"><div class="flow-node"><div class="flow-stage">背景</div><div class="flow-key">人工剪辑成本高</div></div><div class="flow-arrow">→</div><div class="flow-node goal"><div class="flow-stage">目标</div><div class="flow-key">规模化自动生产</div></div><div class="flow-arrow">→</div><div class="flow-node action"><div class="flow-stage">行动</div><div class="flow-key">4个环节</div></div><div class="flow-arrow">→</div><div class="flow-node result"><div class="flow-stage">结果</div><div class="flow-key">CTR增长197%</div></div></div>
+            <div class="proj-detail-block"><span class="proj-detail-label bg">背景</span><p class="proj-detail-text">海外短剧在海外平台的买量素材高度依赖人工剪辑，生产成本高，且难以规模化产出与复刻创意，原有产线产出视频片段跳跃、不连贯；单集所包含内容会有多个剧情线或场景的情况出现，业务侧缺乏可有效的、自动化生产短剧广告投放素材的工作流。</p></div>
+            <div class="proj-detail-block"><span class="proj-detail-label goal">目标</span><p class="proj-detail-text">从产品视角梳理海外高转化短剧素材的共性规律，为海外短剧业务设计自动化生产功能，搭建可规模化自动生产的AI工作流。</p></div>
+            <div class="proj-detail-block"><span class="proj-detail-label action">行动</span><ul class="proj-detail-list"><li>系统调研海外短视频平台近半年高曝光、高下载的短剧素材，分析素材结构、叙事方式与钩子设计，总结高复用的视频结构。</li><li>提出以「事件」为核心的剪辑创作模式，将零散剧情抽象为完整、有因果关系的结构化事件单元，以此搭建了事件知识库。</li><li>规划多套AI创作工作流，覆盖用户意图解析、事件检索、钩子识别、片段拼接、多语言字幕生成等关键环节。</li><li>撰写PRD文档进行评审后，与开发的同学沟通工作流细节与逻辑，成功搭建了两条工作流并进行测试评估，推出上线使用。</li></ul></div>
+            <div class="proj-detail-block"><span class="proj-detail-label result">结果</span><p class="proj-detail-text">有效提升了海外商业化内容投放质量，投放首周核心指标增长87%，CTR增长197%。</p></div>
+          </div>
+        </div>
+        <div class="proj-item">
+          <div class="proj-item-head open"><div class="proj-item-head-left"><div class="proj-item-title">影视剧二创短视频创作Agent</div><div class="proj-item-time">爱奇艺 · 2025.12 - 2026.01</div></div><span class="proj-item-badge">播放 +93%</span></div>
+          <div class="proj-item-body open">
+            <div class="flow"><div class="flow-node"><div class="flow-stage">背景</div><div class="flow-key">产线分散不可编辑</div></div><div class="flow-arrow">→</div><div class="flow-node goal"><div class="flow-stage">目标</div><div class="flow-key">可编辑子Agent</div></div><div class="flow-arrow">→</div><div class="flow-node action"><div class="flow-stage">行动</div><div class="flow-key">4个环节</div></div><div class="flow-arrow">→</div><div class="flow-node result"><div class="flow-stage">结果</div><div class="flow-key">播放量增长93%</div></div></div>
+            <div class="proj-detail-block"><span class="proj-detail-label bg">背景</span><p class="proj-detail-text">在影视剧二创短视频的内容生产中，自动化创作的多条产线入口分散，且不支持视频编辑，对于需要精细优化的视频无法支持用户手动编辑调整。</p></div>
+            <div class="proj-detail-block"><span class="proj-detail-label goal">目标</span><p class="proj-detail-text">搭建可编辑的影视剧解说类创作子Agent，实现从解说生成到视频拼接的自动化流程，同时保证生成内容在质量上的可控性，满足用户的编辑需求。</p></div>
+            <div class="proj-detail-block"><span class="proj-detail-label action">行动</span><ul class="proj-detail-list"><li>负责解说Agent的产品方案设计，通过Agent实现解说内容的智能化生产</li><li>提出以爆文衍生的方式进行解说类视频创作</li><li>主导P0需求拆解与PRD撰写，包括Agent搭建以及解说字幕画布、分镜编辑能力，以及语音重生成后的视频时长自适应方案</li><li>协同前后端规划音色调整、语音时长提示与预览交互，提升创作内容的可控性与可用性</li></ul></div>
+            <div class="proj-detail-block"><span class="proj-detail-label result">结果</span><p class="proj-detail-text">有效提升了运营团队的生产效率与生产质量，业务方发布数量提升27%，日均播放量增长93%，万赞视频数增长82%。</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== INTERN DETAIL: JIAREN ===== -->
+  <div class="page" id="page-intern-jiaren">
+    <div class="subpage">
+      <div class="crumb-bar"><span>Portfolio</span><i>/</i><span class="crumb-active">嘉人实习</span><i>/</i><span>2026</span></div>
+      <div class="container">
+        <button class="back-btn" data-nav="projects">← 工作项目</button>
+        <div class="sub-hero">
+          <h1 class="handwriting">嘉人 · 内容运营</h1>
+          <p class="sub-lead">2025.05 - 2025.08 · 小红书账号运营与品牌内容</p>
+        </div>
+
+        <p class="sec-title">我的能力与思考</p>
+        <h2 class="sec-head">从涨粉到品牌 IP 孵化</h2>
+        <div class="ability-grid">
+          <div class="ability-card"><div class="ability-icon"><svg class="icon" width="22" height="22" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div><h3 class="ability-title">账号运营</h3><p class="ability-desc">官方号涨粉 4w+ 的同时，从 0 到 1 搭建附属宠物账号实现粉丝 1000+，用 AIGC 进行内容创作，形成「主号增长 + 副号孵化」双轨打法。</p></div>
+          <div class="ability-card"><div class="ability-icon"><svg class="icon" width="22" height="22" viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg></div><h3 class="ability-title">视频创意策划</h3><p class="ability-desc">独立承担创意方案策划、拍摄执行与传播设计，将品牌调性与热点话题结合，节奏化传播，单条视频 5w+ 点赞、热点榜 top4 持续 48h。</p></div>
+          <div class="ability-card"><div class="ability-icon"><svg class="icon" width="22" height="22" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><line x1="2" y1="17" x2="12" y2="22"/><line x1="12" y1="22" x2="22" y2="17"/></svg></div><h3 class="ability-title">品牌活动策划</h3><p class="ability-desc">从 0 到 1 策划「嘉人开麦」新栏目 IP，设计形式、互动规则、视觉风格，撰写策划案提案通过并落地，首发视频即 2w+ 点赞开门红。</p></div>
+          <div class="ability-card"><div class="ability-icon"><svg class="icon" width="22" height="22" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8 13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg></div><h3 class="ability-title">内容创作</h3><p class="ability-desc">独立完成小红书视频与图文内容创作，及每周公众号时尚资讯推文编写，提高阅读量和用户粘性，建立稳定的内容产出节奏。</p></div>
+        </div>
+
+        <div class="contrib-box">
+          <p class="sec-title">核心贡献</p>
+          <h3>单条视频 5w+ 点赞</h3>
+          <div class="data-row">
+            <div class="data-circle"><div class="num">4w+</div><div class="lbl">官方号涨粉</div></div>
+            <div class="data-circle"><div class="num">5w+</div><div class="lbl">单条视频点赞</div></div>
+            <div class="data-circle"><div class="num">百万</div><div class="lbl">活动阅读量</div></div>
+          </div>
+        </div>
+
+        <p class="sec-title">实习概述</p>
+        <div class="wcard" style="margin-bottom:48px"><p style="font-size:15px;color:var(--ref-ink);line-height:1.8">主要职责：负责嘉人小红书官方账号和附属宠物账号的运营与内容创作。围绕账号涨粉、热点视频创意策划、品牌活动策划与内容创作，用 AIGC 赋能内容生产，将品牌调性与热点节奏结合，实现涨粉与爆款双突破。</p></div>
+
+        <p class="sec-title">项目详解</p>
+        <h2 class="sec-head">3 个核心项目</h2>
+        <div class="proj-item">
+          <div class="proj-item-head open"><div class="proj-item-head-left"><div class="proj-item-title">嘉人开麦 × Omega品牌活动创意策划</div><div class="proj-item-time">嘉人 · 内容运营</div></div><span class="proj-item-badge">2w+ 点赞</span></div>
+          <div class="proj-item-body open">
+            <div class="flow"><div class="flow-node"><div class="flow-stage">背景</div><div class="flow-key">打造新栏目IP</div></div><div class="flow-arrow">→</div><div class="flow-node goal"><div class="flow-stage">目标</div><div class="flow-key">从0到1策划落地</div></div><div class="flow-arrow">→</div><div class="flow-node action"><div class="flow-stage">行动</div><div class="flow-key">2个环节</div></div><div class="flow-arrow">→</div><div class="flow-node result"><div class="flow-stage">结果</div><div class="flow-key">2w+点赞开门红</div></div></div>
+            <div class="proj-detail-block"><span class="proj-detail-label bg">背景</span><p class="proj-detail-text">需要为品牌客户打造一档全新的商业化栏目IP，以突破传统的营销方式，提升用户粘性。</p></div>
+            <div class="proj-detail-block"><span class="proj-detail-label goal">目标</span><p class="proj-detail-text">从0到1策划并开创「嘉人开麦」新栏目，负责其策划、视觉定位的设定，并完成首期的落地。</p></div>
+            <div class="proj-detail-block"><span class="proj-detail-label action">行动</span><ul class="proj-detail-list"><li>玩法与规则设计：设计了栏目的基本形式、互动规则和视觉风格，并撰写策划案，向团队和品牌方提案并获得通过。</li><li>上线与效果监控：栏目上线后，监控首发视频的核心数据，分析用户互动评论，评估栏目初期表现。</li></ul></div>
+            <div class="proj-detail-block"><span class="proj-detail-label result">结果</span><p class="proj-detail-text">新栏目首发视频即收获2w+点赞，实现"开门红"，成功为品牌开辟了新的内容阵地。</p></div>
+          </div>
+        </div>
+        <div class="proj-item">
+          <div class="proj-item-head open"><div class="proj-item-head-left"><div class="proj-item-title">馥绿德雅商业直播活动</div><div class="proj-item-time">嘉人 · 内容运营</div></div><span class="proj-item-badge">2w+ 观看</span></div>
+          <div class="proj-item-body open">
+            <div class="flow"><div class="flow-node"><div class="flow-stage">背景</div><div class="flow-key">提升直播转化</div></div><div class="flow-arrow">→</div><div class="flow-node goal"><div class="flow-stage">目标</div><div class="flow-key">竞品分析+脚本设计</div></div><div class="flow-arrow">→</div><div class="flow-node action"><div class="flow-stage">行动</div><div class="flow-key">3个环节</div></div><div class="flow-arrow">→</div><div class="flow-node result"><div class="flow-stage">结果</div><div class="flow-key">2w+观看人数</div></div></div>
+            <div class="proj-detail-block"><span class="proj-detail-label bg">背景</span><p class="proj-detail-text">参与馥绿德雅品牌洗护发产品的商业直播项目，目标是提升直播观看人数、用户停留时长。</p></div>
+            <div class="proj-detail-block"><span class="proj-detail-label goal">目标</span><p class="proj-detail-text">进行竞品分析并参与直播脚本与互动环节的设计，以优化流量转化效率。</p></div>
+            <div class="proj-detail-block"><span class="proj-detail-label action">行动</span><ul class="proj-detail-list"><li>竞品分析：我横向分析了Vogue、芭莎等竞对的直播活动，从福利设置、互动节奏、主播话术等维度进行对比，输出分析报告。</li><li>策略制定：基于分析结论，我提议优化抽奖环节的触发机制（评论关键词），并设计了关于产品功效的问答互动脚本，以提升用户停留时长。</li><li>数据支持：我梳理了品牌方提供的用户画像数据与产品评论，提炼出用户对"提升色泽功效"的核心关注点，并将其融入明星嘉宾的话术设计中。</li></ul></div>
+            <div class="proj-detail-block"><span class="proj-detail-label result">结果</span><p class="proj-detail-text">我提出的优化方案被采纳并实施，直播观看人数达2w+，活动圆满完成。</p></div>
+          </div>
+        </div>
+        <div class="proj-item">
+          <div class="proj-item-head open"><div class="proj-item-head-left"><div class="proj-item-title">赵今麦 × MIUMIU品牌活动创意宣传策划与执行</div><div class="proj-item-time">嘉人 · 内容运营</div></div><span class="proj-item-badge">5w+ 点赞</span></div>
+          <div class="proj-item-body open">
+            <div class="flow"><div class="flow-node"><div class="flow-stage">背景</div><div class="flow-key">提升品牌曝光口碑</div></div><div class="flow-arrow">→</div><div class="flow-node goal"><div class="flow-stage">目标</div><div class="flow-key">创意+发布+复盘</div></div><div class="flow-arrow">→</div><div class="flow-node action"><div class="flow-stage">行动</div><div class="flow-key">3个环节</div></div><div class="flow-arrow">→</div><div class="flow-node result"><div class="flow-stage">结果</div><div class="flow-key">5w+点赞百万曝光</div></div></div>
+            <div class="proj-detail-block"><span class="proj-detail-label bg">背景</span><p class="proj-detail-text">独立负责明星赵今麦与MIUMIU品牌合作活动的线上内容策划与传播，目标是提升品牌在小红书平台的曝光量与正面口碑。</p></div>
+            <div class="proj-detail-block"><span class="proj-detail-label goal">目标</span><p class="proj-detail-text">策划创意视频内容、安排发布节奏，并对最终传播效果进行复盘。</p></div>
+            <div class="proj-detail-block"><span class="proj-detail-label action">行动</span><ul class="proj-detail-list"><li>内容策划与执行：我分析了小红书平台的热点趋势和MIUMIU的品牌调性，策划了"ABB"的主题视频，独立完成拍摄协调与剪辑。</li><li>发布策略：我制定了分时段、带热门话题的发布策略，并在发布后持续监控评论区舆情。</li><li>效果复盘：活动结束后，我使用Excel对视频的播放量、点赞率、分享数等数据进行了多维度复盘，分析了爆款因素。</li></ul></div>
+            <div class="proj-detail-block"><span class="proj-detail-label result">结果</span><p class="proj-detail-text">该条视频成为爆款，最终收获5w+点赞，曝光量超百万，远超预期目标。</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== DESIGN ===== -->
+  <div class="page" id="page-design">
+    <div class="subpage">
+      <div class="crumb-bar">
+        <span>Portfolio</span><i>/</i><span class="crumb-active">Design</span><i>/</i><span>2026</span>
+      </div>
+      <div class="container">
+        <button class="back-btn" data-nav="home">← Portfolio</button>
+        <div class="sub-hero">
+          <h1 class="handwriting">Design Work</h1>
+          <p class="sub-lead">Selected graphic design & visual projects</p>
+        </div>
+
+        <div class="design-gallery">
+          <div class="design-card zoomable" data-modal="design/白蛇AIGC_detail.jpg">
+            <div class="design-card-img"><img src="design/白蛇AIGC_cover.jpg" alt="白蛇 AIGC"></div>
+            <div class="design-card-body"><h3 class="design-card-title">白蛇 AIGC</h3><p class="design-card-desc">基于 AIGC 创作的《白蛇传 × 二十四节气》动画短片，叙事连贯、视觉风格统一，获课程最高评分。</p></div>
+          </div>
+          <div class="design-card zoomable" data-modal="design-popo-detail.jpg">
+            <div class="design-card-img"><img src="design-popo-cover.jpg" alt="Popo Music 网页"></div>
+            <div class="design-card-body"><h3 class="design-card-title">Popo Music 网页</h3><p class="design-card-desc">音乐播放器网页设计，探索音频内容在浏览器中的交互形态与浏览体验。</p></div>
+          </div>
+          <div class="design-card zoomable" data-modal="design-rhonda-detail.jpg">
+            <div class="design-card-img"><img src="design-rhonda-cover.jpg" alt="可持续隆达"></div>
+            <div class="design-card-body"><h3 class="design-card-title">可持续隆达</h3><p class="design-card-desc">可持续主题视觉设计，以隆达符号传达循环与共生的理念。</p></div>
+          </div>
+          <div class="design-card zoomable" data-modal="design-wenchuang-detail.jpg">
+            <div class="design-card-img"><img src="design-wenchuang-cover.jpg" alt="文创产品"></div>
+            <div class="design-card-body"><h3 class="design-card-title">文创产品</h3><p class="design-card-desc">文创产品设计，融合传统元素与现代产品形态，兼顾文化表达与实用性。</p></div>
+          </div>
+          <div class="design-card zoomable" data-modal="design-cup-detail.jpg">
+            <div class="design-card-img"><img src="design-cup-cover.jpg" alt="无障碍水杯"></div>
+            <div class="design-card-body"><h3 class="design-card-title">无障碍水杯</h3><p class="design-card-desc">无障碍水杯设计，关注视障人群的饮水体验与操作可达性。</p></div>
+          </div>
+          <div class="design-card zoomable" data-modal="design-truck-detail.jpg">
+            <div class="design-card-img"><img src="design-truck-cover.jpg" alt="货车 HMI"></div>
+            <div class="design-card-body"><h3 class="design-card-title">货车 HMI</h3><p class="design-card-desc">货车座舱 HMI 设计，围绕长途驾驶场景优化交互与信息呈现。</p></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== VIBE CODING ===== -->
+  <div class="page" id="page-vibe">
+    <div class="subpage dark">
+      <div class="crumb-bar">
+        <span style="color:#8b949e">Portfolio</span><i style="color:#8b949e">/</i><span class="crumb-active">Vibe Coding</span><i style="color:#8b949e">/</i><span style="color:#8b949e">2026</span>
+      </div>
+      <div class="container">
+        <button class="back-btn" data-nav="home">← Portfolio</button>
+        <div class="sub-hero">
+          <h1 class="handwriting">Vibe Coding</h1>
+          <p class="sub-lead">用 AI 辅助编程把想法变成现实</p>
+        </div>
+
+        <div class="vc-philosophy">
+          <p>
+            我相信 vibe coding 不是「不用动脑」，而是把执行力的门槛降低，让想法可以快速验证。
+            从需求文档到可运行 demo，有时候只需要一个下午。<br><br>
+            <span style="color:var(--primary-on-dark)">工作中</span>：开发评测工具、自动化 Skill、数据看板，把重复劳动交给程序。<br>
+            <span style="color:#3fb950">生活中</span>：番茄钟、求职追踪、笔记助手，自己的问题自己解决。
+          </p>
+        </div>
+
+        <div class="vc-section-title" style="color:#f0883e;border-color:#f0883e">工作场景</div>
+        <div class="vc-grid">
+          <div class="vc-card">
+            <div class="vc-card-icon" style="color:#f0883e"><svg class="icon" width="24" height="24" viewBox="0 0 24 24"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/></svg></div>
+            <div class="vc-card-title">客服语音通话标注工具</div>
+            <p class="vc-card-desc">独立开发，支持文本＋音频双模态标注，实现语音标注从纯人工到系统自动标注的跨越</p>
+            <div class="vc-tags"><span class="vc-tag">React</span><span class="vc-tag">Audio API</span><span class="vc-tag">标注系统</span></div>
+          </div>
+          <div class="vc-card">
+            <div class="vc-card-icon" style="color:#f0883e"><svg class="icon" width="24" height="24" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg></div>
+            <div class="vc-card-title">ASR 自动标注及可视化系统</div>
+            <p class="vc-card-desc">基于大模型驱动自动归因，评测周期从天级压缩至小时级，准确率和召回率均超 90%</p>
+            <div class="vc-tags"><span class="vc-tag">LLM</span><span class="vc-tag">数据可视化</span><span class="vc-tag">自动化</span></div>
+          </div>
+          <div class="vc-card">
+            <div class="vc-card-icon" style="color:#f0883e"><svg class="icon" width="24" height="24" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+            <div class="vc-card-title">自动提数 Skill 体系</div>
+            <p class="vc-card-desc">自动提数 Skill · 客服数据埋点串表 Skill · 数据波动分析 Skill · 场景意图形成 Skill · 评测报告产出 Skill，将高频工作流自动化</p>
+            <div class="vc-tags"><span class="vc-tag">Skill 工程</span><span class="vc-tag">自动化</span><span class="vc-tag">Agent</span></div>
+          </div>
+        </div>
+
+        <div class="vc-section-title" style="color:#3fb950;border-color:#3fb950">生活场景</div>
+        <div class="vc-grid">
+          <div class="vc-card">
+            <div class="vc-card-icon" style="color:#3fb950"><svg class="icon" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+            <div class="vc-card-title">番茄钟专注 App</div>
+            <p class="vc-card-desc">为个人高效学习开发的专注计时应用，支持任务管理和专注数据统计</p>
+            <div class="vc-tags"><span class="vc-tag">React</span><span class="vc-tag">本地存储</span><span class="vc-tag">效率工具</span></div>
+          </div>
+          <div class="vc-card">
+            <div class="vc-card-icon" style="color:#3fb950"><svg class="icon" width="24" height="24" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/></svg></div>
+            <div class="vc-card-title">秋招进度监控网站</div>
+            <p class="vc-card-desc">实时追踪秋招投递进度与反馈状态，支持多维筛选与可视化展示</p>
+            <div class="vc-tags"><span class="vc-tag">数据可视化</span><span class="vc-tag">状态管理</span></div>
+          </div>
+          <div class="vc-card">
+            <div class="vc-card-icon" style="color:#3fb950"><svg class="icon" width="24" height="24" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg></div>
+            <div class="vc-card-title">小红书笔记智能收藏</div>
+            <p class="vc-card-desc">基于 AI 的笔记自动分类与语义检索功能，解决「收藏了但找不到」的问题</p>
+            <div class="vc-tags"><span class="vc-tag">LLM</span><span class="vc-tag">向量检索</span><span class="vc-tag">浏览器插件</span></div>
+          </div>
+          <div class="vc-card">
+            <div class="vc-card-icon" style="color:#3fb950"><svg class="icon" width="24" height="24" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+            <div class="vc-card-title">这个作品集网站</div>
+            <p class="vc-card-desc">用 Figma Make + vibe coding 构建的交互式作品集，包含 macOS 风格 UI 和多页面导航</p>
+            <div class="vc-tags"><span class="vc-tag">React</span><span class="vc-tag">Figma Make</span><span class="vc-tag">Vibe Coding</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== INTERESTS ===== -->
+  <div class="page" id="page-interests">
+    <div class="subpage">
+      <div class="crumb-bar">
+        <span>Portfolio</span><i>/</i><span class="crumb-active">Interests</span><i>/</i><span>2026</span>
+      </div>
+      <div class="container">
+        <button class="back-btn" data-nav="home">← Portfolio</button>
+        <div class="sub-hero">
+          <h1 class="handwriting">Beyond Work</h1>
+          <p class="sub-lead">生活不只有工作，这些是让我充电的地方</p>
+        </div>
+
+        <div class="if-folder">
+          <div class="if-folder-tab">
+            <span class="if-tab-label">INTERESTS</span>
+            <span class="if-tab-count">4 items</span>
+          </div>
+          <div class="if-folder-body">
+            <div class="if-cards">
+              <!-- 篮球 -->
+              <div class="if-card" style="--rot:-4deg;--oy:-6px;">
+                <img src="interest-basketball.jpg" alt="篮球">
+                <div class="if-desc"><p>本科四年坚持每周篮球训练，担任女子篮球队队长，带队荣获女子篮球比赛冠军。篮球教会了我团队协作和领导力。</p></div>
+                <div class="if-shade"></div>
+                <div class="if-badge" style="color:#ff8c00;"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M4.93 4.93c4.47 4.47 4.47 11.67 0 16.14"/><path d="M19.07 4.93c-4.47 4.47-4.47 11.67 0 16.14"/><line x1="2" y1="12" x2="22" y2="12"/></svg></div>
+                <div class="if-label"><div class="if-title">篮球</div><div class="if-sub">前女篮队长</div></div>
+              </div>
+              <!-- 攀岩 -->
+              <div class="if-card" style="--rot:3deg;--oy:8px;">
+                <img src="interest-climbing.jpg" alt="攀岩">
+                <div class="if-desc"><p>攀岩让我在垂直的岩壁上寻找路径，每一次抓握都是专注力的极致训练。它教会我在压力下保持冷静，在看似无解的局面里找到下一个支点。</p></div>
+                <div class="if-shade"></div>
+                <div class="if-badge" style="color:#10b981;"><svg class="icon" viewBox="0 0 24 24"><path d="M3 20l6-11 4 6 2.5-4L21 20z"/><path d="M3 20h18"/></svg></div>
+                <div class="if-label"><div class="if-title">攀岩</div><div class="if-sub">向上生长</div></div>
+              </div>
+              <!-- 架子鼓 -->
+              <div class="if-card" style="--rot:-3deg;--oy:-4px;">
+                <img src="interest-drum.jpg" alt="架子鼓">
+                <div class="if-desc"><p>打鼓让我在快节奏的产品工作之外找到另一种专注状态。节奏感不只属于音乐，也属于产品迭代。</p></div>
+                <div class="if-shade"></div>
+                <div class="if-badge" style="color:#ef4444;"><svg class="icon" viewBox="0 0 24 24"><ellipse cx="12" cy="10" rx="10" ry="4"/><path d="M2 10v6c0 2.21 4.48 4 10 4s10-1.79 10-4v-6"/><line x1="8" y1="4" x2="4" y2="1"/><line x1="16" y1="4" x2="20" y2="1"/></svg></div>
+                <div class="if-label"><div class="if-title">架子鼓</div><div class="if-sub">节奏控</div></div>
+              </div>
+              <!-- 摄影 & 视频 (clickable → album) -->
+              <div class="if-card clickable" data-album="photo" style="--rot:4deg;--oy:6px;">
+                <img src="photo-2.jpg" alt="摄影">
+                <div class="if-desc"><p>热爱摄影和视频拍摄，具备良好的审美能力。在嘉人担任运营期间独立完成视频创意策划、拍摄执行，单条视频获 5w+ 点赞。</p></div>
+                <div class="if-shade"></div>
+                <div class="if-badge" style="color:#0ea5e9;"><svg class="icon" viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+                <div class="if-label"><div class="if-title">摄影 &amp; 视频</div><div class="if-sub">视觉表达者 · 点击查看相册</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PHOTO ALBUM ===== -->
+  <div class="page" id="page-photo-album">
+    <div class="subpage dark">
+      <div class="crumb-bar"><span>Portfolio</span><i>/</i><span>Interests</span><i>/</i><span class="crumb-active">Photography</span></div>
+      <div class="container">
+        <button class="back-btn" data-nav="interests" style="color:#fff;border-color:rgba(255,255,255,0.2)">← 兴趣爱好</button>
+        <div class="sub-hero">
+          <h1 class="handwriting">Photography</h1>
+          <p class="sub-lead">用镜头记录生活 · 9 frames</p>
+        </div>
+
+        <div class="album-hero" data-photo="2">
+          <img src="photo-2.jpg" alt="">
+          <div class="album-hero-overlay">
+            <p class="album-hero-eyebrow">PHOTOGRAPHY · 光影记录</p>
+            <h2 class="album-hero-title">用镜头观察世界</h2>
+            <p class="album-hero-desc">摄影是我观察世界的方式。每一帧都是一次专注的凝视，把流动的瞬间凝固成可被反复回味的画面。</p>
+          </div>
+        </div>
+
+        <div class="album-masonry">
+          <div class="album-tile" data-photo="1"><span class="album-tile-num">01</span><img src="photo-1.jpg" alt=""></div>
+          <div class="album-tile" data-photo="3"><span class="album-tile-num">02</span><img src="photo-3.jpg" alt=""></div>
+          <div class="album-tile" data-photo="4"><span class="album-tile-num">03</span><img src="photo-4.jpg" alt=""></div>
+          <div class="album-tile" data-photo="5"><span class="album-tile-num">04</span><img src="photo-5.jpg" alt=""></div>
+          <div class="album-tile" data-photo="6"><span class="album-tile-num">05</span><img src="photo-6.jpg" alt=""></div>
+          <div class="album-tile" data-photo="7"><span class="album-tile-num">06</span><img src="photo-7.jpg" alt=""></div>
+          <div class="album-tile" data-photo="8"><span class="album-tile-num">07</span><img src="photo-8.jpg" alt=""></div>
+          <div class="album-tile" data-photo="9"><span class="album-tile-num">08</span><img src="photo-9.jpg" alt=""></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- Dock modal (contacts / messages / mail / notes / trash) -->
+<div class="dock-modal" id="dockModal">
+  <div class="dock-win" id="dockWin">
+    <div class="dock-titlebar">
+      <button class="dock-close" id="dockModalClose" aria-label="关闭"></button>
+      <span class="dock-traffic y"></span>
+      <span class="dock-traffic g"></span>
+      <span class="dock-win-title" id="dockModalTitle"></span>
+    </div>
+    <div class="dock-win-body" id="dockModalBody"></div>
+  </div>
+</div>
+
+<!-- Design detail modal -->
+<div class="design-modal" id="designModal">
+  <button class="design-modal-close" id="designModalClose" aria-label="关闭">×</button>
+  <img class="design-modal-img" id="designModalImg" src="" alt="">
+</div>
+
+<!-- Photo lightbox -->
+<div class="lightbox" id="photoLightbox">
+  <button class="lightbox-close" id="lightboxClose" aria-label="关闭">×</button>
+  <button class="lightbox-btn prev" id="lightboxPrev" aria-label="上一张">‹</button>
+  <div class="lightbox-stage"><img id="lightboxImg" src="" alt=""></div>
+  <button class="lightbox-btn next" id="lightboxNext" aria-label="下一张">›</button>
+  <div class="lightbox-counter"><b id="lightboxCurr">1</b> / <span id="lightboxTotal">7</span></div>
+</div>
+
+<script>
+  // ===== Navigation between pages =====
+  var PAGES = ["home","about","projects","design","vibe","interests"];
+  var navbar = document.getElementById('navbar');
+  var navLinks = document.querySelectorAll('[data-nav]');
+
+  function hideAllPages() {
+    document.querySelectorAll('.page').forEach(function(el) {
+      el.classList.remove('active');
+    });
+  }
+
+  function navigate(page) {
+    hideAllPages();
+    var el = document.getElementById('page-' + page);
+    if (el) el.classList.add('active');
+    document.querySelectorAll('.nav-link').forEach(function(b) {
+      b.classList.toggle('active', b.getAttribute('data-nav') === page);
+    });
+    var dark = page === 'vibe';
+    navbar.classList.toggle('dark', dark);
+    var dock = document.getElementById('dock');
+    if (dock) dock.style.display = page === 'home' ? 'flex' : 'none';
+    window.scrollTo({ top: 0 });
+  }
+
+  function navigateIntern(intern) {
+    hideAllPages();
+    var el = document.getElementById('page-intern-' + intern);
+    if (el) el.classList.add('active');
+    document.querySelectorAll('.nav-link').forEach(function(b) {
+      b.classList.remove('active');
+    });
+    navbar.classList.remove('dark');
+    var dock = document.getElementById('dock');
+    if (dock) dock.style.display = 'none';
+    window.scrollTo({ top: 0 });
+  }
+
+  function navigateSubPage(pageId, dark) {
+    hideAllPages();
+    var el = document.getElementById(pageId);
+    if (el) el.classList.add('active');
+    document.querySelectorAll('.nav-link').forEach(function(b) {
+      b.classList.remove('active');
+    });
+    navbar.classList.toggle('dark', !!dark);
+    var dock = document.getElementById('dock');
+    if (dock) dock.style.display = 'none';
+    window.scrollTo({ top: 0 });
+  }
+
+  navLinks.forEach(function(el) {
+    el.addEventListener('click', function() { navigate(el.getAttribute('data-nav')); });
+  });
+
+  document.querySelectorAll('.view-detail-btn').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      navigateIntern(btn.getAttribute('data-intern'));
+    });
+  });
+
+  document.querySelectorAll('[data-album]').forEach(function(card) {
+    card.addEventListener('click', function() {
+      navigateSubPage('page-photo-album', true);
+    });
+  });
+
+  // ===== Photo lightbox =====
+  (function () {
+    var photos = ['photo-1.jpg','photo-2.jpg','photo-3.jpg','photo-4.jpg','photo-5.jpg','photo-6.jpg','photo-7.jpg','photo-8.jpg','photo-9.jpg'];
+    var lb = document.getElementById('photoLightbox');
+    var lbImg = document.getElementById('lightboxImg');
+    var lbCurr = document.getElementById('lightboxCurr');
+    var lbTotal = document.getElementById('lightboxTotal');
+    var idx = 0;
+    lbTotal.textContent = photos.length;
+
+    function show(i) {
+      idx = (i + photos.length) % photos.length;
+      lbImg.src = photos[idx];
+      lbCurr.textContent = idx + 1;
+    }
+    function openAt(photoNum) {
+      var i = photoNum - 1;
+      show(i);
+      lb.classList.add('open');
+    }
+    function close() { lb.classList.remove('open'); lbImg.src = ''; }
+
+    document.querySelectorAll('[data-photo]').forEach(function(el) {
+      el.addEventListener('click', function(e) {
+        e.stopPropagation();
+        openAt(parseInt(el.getAttribute('data-photo'), 10));
+      });
+    });
+    document.getElementById('lightboxClose').addEventListener('click', close);
+    document.getElementById('lightboxPrev').addEventListener('click', function(e) { e.stopPropagation(); show(idx - 1); });
+    document.getElementById('lightboxNext').addEventListener('click', function(e) { e.stopPropagation(); show(idx + 1); });
+    lb.addEventListener('click', function(e) { if (e.target === lb) close(); });
+    document.addEventListener('keydown', function(e) {
+      if (!lb.classList.contains('open')) return;
+      if (e.key === 'Escape') close();
+      else if (e.key === 'ArrowLeft') show(idx - 1);
+      else if (e.key === 'ArrowRight') show(idx + 1);
+    });
+  })();
+
+  // ===== Design detail modal =====
+  (function () {
+    var modal = document.getElementById('designModal');
+    var modalImg = document.getElementById('designModalImg');
+    var modalClose = document.getElementById('designModalClose');
+    if (!modal) return;
+    function openModal(src) {
+      modalImg.src = src;
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal() {
+      modal.classList.remove('open');
+      modalImg.src = '';
+      document.body.style.overflow = '';
+    }
+    document.querySelectorAll('.design-card[data-modal]').forEach(function (card) {
+      card.addEventListener('click', function () { openModal(card.getAttribute('data-modal')); });
+    });
+    modalClose.addEventListener('click', closeModal);
+    modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
+  })();
+
+  // ===== Projects accordion =====
+  document.querySelectorAll('.job-head').forEach(function(head) {
+    head.addEventListener('click', function() {
+      var body = head.nextElementSibling;
+      var arrow = head.querySelector('.job-arrow');
+      var open = head.classList.toggle('open');
+      body.classList.toggle('open', open);
+      arrow.classList.toggle('open', open);
+    });
+  });
+
+  // Project item accordion
+  document.querySelectorAll('.proj-item-head').forEach(function(head) {
+    head.addEventListener('click', function() {
+      var body = head.nextElementSibling;
+      var open = head.classList.toggle('open');
+      body.classList.toggle('open', open);
+    });
+  });
+
+  // Projects tab scroll (实习经历 / 项目经历)
+  document.querySelectorAll('#page-projects .tab-nav .tab').forEach(function(tab, i) {
+    tab.addEventListener('click', function() {
+      var dividers = document.querySelectorAll('#page-projects .exp-divider');
+      var target = dividers[i];
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  // ===== Tab nav (visual only) =====
+  document.querySelectorAll('.tab-nav').forEach(function(nav) {
+    var tabs = nav.querySelectorAll('.tab');
+    tabs.forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        tabs.forEach(function(t) { t.classList.remove('active'); });
+        tab.classList.add('active');
+      });
+    });
+  });
+
+  // ===== macOS dock magnification =====
+  (function () {
+    var dock = document.getElementById('dock');
+    if (!dock) return;
+    var items = [].slice.call(dock.querySelectorAll('.dock-item'));
+    var BASE = 52, MAX = 1.3, MID = 1.12;
+    var hovered = null;
+    function extraWidth(scale) { return (scale - 1) * BASE; }
+    function translateX(i) {
+      if (hovered === null) return 0;
+      var h = extraWidth(MAX), m = extraWidth(MID);
+      if (i < hovered) return i === hovered - 1 ? -(h / 2 + m / 2) : -(h / 2 + m);
+      if (i > hovered) return i === hovered + 1 ? (h / 2 + m / 2) : (h / 2 + m);
+      return 0;
+    }
+    function render() {
+      items.forEach(function (item, i) {
+        var scale = 1, tx = 0;
+        if (hovered !== null) {
+          var dist = i - hovered;
+          scale = dist === 0 ? MAX : (Math.abs(dist) === 1 ? MID : 1);
+          tx = translateX(i);
+        }
+        var size = BASE * scale;
+        var ty = scale > 1 ? -(size - BASE) : 0;
+        item.style.transform = 'translateX(' + tx + 'px) translateY(' + ty + 'px) scale(' + scale + ')';
+        item.style.zIndex = scale > 1 ? 2 : 1;
+      });
+    }
+    items.forEach(function (item, i) {
+      item.addEventListener('mouseenter', function () { hovered = i; render(); });
+      item.addEventListener('mouseleave', function () { hovered = null; render(); });
+    });
+  })();
+
+  // ===== Dock modals: contact / notes / trash =====
+  (function () {
+    var modal = document.getElementById('dockModal');
+    var win = document.getElementById('dockWin');
+    var titleEl = document.getElementById('dockModalTitle');
+    var bodyEl = document.getElementById('dockModalBody');
+    var closeBtn = document.getElementById('dockModalClose');
+    if (!modal) return;
+
+    function open(title, bodyHTML, cls) {
+      titleEl.textContent = title;
+      bodyEl.innerHTML = bodyHTML;
+      win.className = 'dock-win' + (cls ? ' ' + cls : '');
+      modal.classList.add('open');
+    }
+    function close() { modal.classList.remove('open'); bodyEl.innerHTML = ''; }
+    closeBtn.addEventListener('click', close);
+    modal.addEventListener('click', function (e) { if (e.target === modal) close(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+
+    function copyText(text, btn) {
+      var done = function () {
+        if (!btn) return;
+        var o = btn.textContent; btn.textContent = '已复制 ✓'; btn.classList.add('done');
+        setTimeout(function () { btn.textContent = o; btn.classList.remove('done'); }, 1600);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done).catch(function () { fallbackCopy(text); done(); });
+      } else { fallbackCopy(text); done(); }
+    }
+    function fallbackCopy(text) {
+      var ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); } catch (e) {}
+      document.body.removeChild(ta);
+    }
+
+    var ICONS = {
+      phone: '<svg class="icon" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.13.96.36 1.9.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0122 16.92z"/></svg>',
+      wechat: '<svg class="icon" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>',
+      mail: '<svg class="icon" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>'
+    };
+    function contactCard(o) {
+      return '<div class="ccard">'
+        + '<div class="ccard-icon">' + (ICONS[o.icon] || '') + '</div>'
+        + '<div class="ccard-label">' + o.label + '</div>'
+        + '<div class="ccard-value">' + o.value + '</div>'
+        + '<button class="ccard-copy" data-copy="' + o.value + '">复制</button>'
+        + '<div class="ccard-hint">' + o.hint + '</div>'
+        + '</div>';
+    }
+    var CONTACTS = {
+      contacts: { title: '通讯录', icon: 'phone', label: '电话', value: '18008199877', hint: '点击下方按钮即可复制电话号码' },
+      messages: { title: '信息', icon: 'wechat', label: '微信', value: 'gxf03079877', hint: '点击下方按钮即可复制微信号' },
+      mail:     { title: '邮件', icon: 'mail', label: '邮箱', value: '386476092@qq.com', hint: '点击下方按钮即可复制邮箱地址' }
+    };
+
+    // Guestbook (notes) — ported from original NotesModal
+    var MESSAGES = [
+      { name: 'Emma', text: 'Finis 是个非常有创意、执行力超强的同学，一起做项目很愉快！', time: '2026-07-12' },
+      { name: 'Alex', text: '看了你的 vibe coding 项目，真的很厉害，期待合作！', time: '2026-08-01' },
+      { name: 'Lily', text: '篮球队的小菲姐永远是最努力的那个，带队拿冠军那天真的太燃了。', time: '2026-08-15' }
+    ];
+    function msgHTML(m) {
+      return '<div class="gb-msg"><div class="gb-msg-head"><span class="gb-name">' + m.name + '</span><span class="gb-time">' + m.time + '</span></div><p class="gb-text">' + m.text + '</p></div>';
+    }
+    function guestbookHTML() {
+      return '<div class="gb"><p class="gb-lead">来给 Finis 留下你的评价或建议吧</p>'
+        + '<div class="gb-list" id="gbList">' + MESSAGES.map(msgHTML).join('') + '</div>'
+        + '<div class="gb-form">'
+        + '<input class="gb-input" id="gbName" placeholder="你的名字（可选）">'
+        + '<textarea class="gb-input gb-textarea" id="gbText" placeholder="写下你想说的话..." rows="3"></textarea>'
+        + '<div class="gb-submit-row"><button class="gb-send" id="gbSend">发送</button></div>'
+        + '</div></div>';
+    }
+    function wireGuestbook() {
+      var send = document.getElementById('gbSend');
+      if (!send) return;
+      send.addEventListener('click', function () {
+        var nameEl = document.getElementById('gbName');
+        var textEl = document.getElementById('gbText');
+        var text = textEl.value.trim();
+        if (!text) return;
+        var now = new Date();
+        var time = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+        var name = nameEl.value.trim() || '匿名';
+        var list = document.getElementById('gbList');
+        var div = document.createElement('div'); div.innerHTML = msgHTML({ name: name, text: text, time: time });
+        list.appendChild(div.firstChild);
+        nameEl.value = ''; textEl.value = '';
+        list.scrollTop = list.scrollHeight;
+      });
+    }
+
+    // Trash canvas (碎碎念) — ported from original TrashModal
+    var MUSINGS = [
+      { text: '为什么产品经理要懂代码？\n因为不懂的时候你永远不知道「简单」有多复杂 😅', color: '#fff9c4', x: 40, y: 60, r: -2 },
+      { text: '今天用 vibe coding 两小时做完了\n以前需要三天的需求文档', color: '#c8e6c9', x: 280, y: 40, r: 3 },
+      { text: '设计的本质是解决问题\n而不是让东西「看起来好看」', color: '#fce4ec', x: 520, y: 80, r: -1 },
+      { text: '今日咖啡 ☕ × 3\n明日 deadline × 5', color: '#e3f2fd', x: 100, y: 240, r: 2 },
+      { text: '打完篮球发现\n原来运动才是最好的产品思维', color: '#f3e5f5', x: 360, y: 220, r: -3 },
+      { text: 'AI 会取代 PM 吗？\n不会，但不懂 AI 的 PM 会被懂 AI 的 PM 取代', color: '#fff3e0', x: 580, y: 230, r: 1 },
+      { text: '在杭州的第一年 🍂\n雨很多，但好像习惯了', color: '#e8f5e9', x: 180, y: 380, r: -2 },
+      { text: '想做的事太多\n时间太少\n但还是要一件一件来 ✨', color: '#fff9c4', x: 460, y: 370, r: 2 }
+    ];
+    function trashHTML() {
+      var notes = MUSINGS.map(function (n) {
+        return '<div class="sn-note" style="left:' + n.x + 'px;top:' + n.y + 'px;background:' + n.color + ';transform:rotate(' + n.r + 'deg)" data-r="' + n.r + '">' + n.text + '</div>';
+      }).join('');
+      return '<div class="sn-canvas"><div class="sn-inner">' + notes + '</div></div>';
+    }
+    function wireTrash() {
+      var notes = document.querySelectorAll('.sn-note');
+      notes.forEach(function (el) {
+        var r = el.getAttribute('data-r');
+        el.addEventListener('mouseenter', function () { el.style.transform = 'rotate(' + r + 'deg) scale(1.05)'; el.style.zIndex = '10'; el.style.boxShadow = '4px 8px 24px rgba(0,0,0,0.18)'; });
+        el.addEventListener('mouseleave', function () { el.style.transform = 'rotate(' + r + 'deg) scale(1)'; el.style.zIndex = '1'; el.style.boxShadow = '2px 4px 12px rgba(0,0,0,0.12)'; });
+      });
+    }
+
+    // Dispatch dock clicks
+    document.querySelectorAll('.dock-item[data-dock]').forEach(function (item) {
+      item.addEventListener('click', function () {
+        var type = item.getAttribute('data-dock');
+        if (type === 'notes') { open('留言板', guestbookHTML()); wireGuestbook(); }
+        else if (type === 'trash') { open('碎碎念 · 画布', trashHTML(), 'wide'); wireTrash(); }
+        else if (CONTACTS[type]) { open(CONTACTS[type].title, contactCard(CONTACTS[type])); }
+      });
+    });
+
+    // Delegated copy buttons
+    bodyEl.addEventListener('click', function (e) {
+      var btn = e.target.closest('.ccard-copy');
+      if (!btn) return;
+      copyText(btn.getAttribute('data-copy'), btn);
+    });
+  })();
+</script>
+</body>
+</html>

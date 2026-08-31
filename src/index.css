@@ -1,0 +1,57 @@
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Atma:wght@700&family=Inter:wght@300;400;600&display=swap');
+@import '@figma/astraui/styles.css';
+@import 'tailwindcss';
+
+@font-face {
+  font-family: "Alibaba PuHuiTi 2.0";
+  src: url("https://puhuiti.oss-cn-hangzhou.aliyuncs.com/AlibabaPuHuiTi-2/AlibabaPuHuiTi_2_85_Bold/AlibabaPuHuiTi_2_85_Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Alibaba PuHuiTi 2.0";
+  src: url("https://puhuiti.oss-cn-hangzhou.aliyuncs.com/AlibabaPuHuiTi-2/AlibabaPuHuiTi_2_55_Regular/AlibabaPuHuiTi_2_55_Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+:root {
+  --ink: #1d1d1f;
+  --blue: #0066cc;
+  --parchment: #f5f5f7;
+  --canvas: #ffffff;
+  --nav-bg: rgba(22, 22, 22, 0.88);
+  --muted: #6e6e73;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--ink);
+  background: var(--canvas);
+}
+
+/* Interests page — photo cards scattered on a blue folder */
+.interest-card {
+  transform: rotate(var(--rot, 0deg)) translateY(var(--oy, 0px));
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+  transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.35s ease;
+  will-change: transform;
+}
+.interest-card:hover {
+  transform: rotate(0deg) translateY(-12px) scale(1.045);
+  z-index: 20;
+  box-shadow: 0 22px 50px rgba(0, 0, 0, 0.4);
+}
+.interest-card .interest-desc {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.interest-card:hover .interest-desc {
+  opacity: 1;
+}

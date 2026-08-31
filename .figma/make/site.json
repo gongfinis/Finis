@@ -1,0 +1,10 @@
+{
+  "description": "Showcase your portfolio with a visually appealing website featuring an organized homepage and clickable folders that lead to individual project pages.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
